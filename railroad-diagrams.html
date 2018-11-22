@@ -2,10 +2,10 @@
 <link rel='stylesheet' href='railroad-diagrams.css'>
 <script src='railroad-diagrams.js'></script>
 <style>
-body {
+body svg.railroad-diagram {
 	background-color: hsl(30,20%, 95%);
 }
-h1 {
+h2 {
 	font-family: sans-serif;
 	font-size: 1em;
 }
@@ -24,14 +24,14 @@ div svg.railroad-diagram {
 </style>
 
 <body>
-<h1 id='cql_file'>cql_file</h1>
+<h2 id='cql_file'>cql_file</h1>
 <script>
 ComplexDiagram(
   ZeroOrMore(NonTerminal('definition', {href: '#definition'}))
 ).addTo();
 </script>
 
-<h1 id='definition'>definition</h1><a name='definition'/>
+<h2 id='definition'>definition</h1><a name='definition'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -42,7 +42,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='statement'>statement</h1><a name='statement'/>
+<h2 id='statement'>statement</h1><a name='statement'/>
 <script>
 ComplexDiagram(
   HorizontalChoice(
@@ -67,7 +67,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='schema_definition'>schema_definition</h1><a name='schema_definition'/>
+<h2 id='schema_definition'>schema_definition</h1><a name='schema_definition'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -79,12 +79,12 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='schema_name'>schema_name</h1><a name='schema_name'/>
+<h2 id='schema_name'>schema_name</h1><a name='schema_name'/>
 <script>
 ComplexDiagram(OneOrMore(NonTerminal('id'))).addTo();
 </script>
 
-<h1 id='version_number'>version_number</h1><a name='version_number'/>
+<h2 id='version_number'>version_number</h1><a name='version_number'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -94,7 +94,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='import_definition'>import_definition</h1><a name='import_definition'/>
+<h2 id='import_definition'>import_definition</h1><a name='import_definition'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -108,7 +108,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='version_pattern'>version_pattern</h1><a name='version_pattern'/>
+<h2 id='version_pattern'>version_pattern</h1><a name='version_pattern'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -122,7 +122,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='alias_list'>alias_list</h1><a name='alias_list'/>
+<h2 id='alias_list'>alias_list</h1><a name='alias_list'/>
 <script>
 ComplexDiagram(
   ZeroOrMore(
@@ -134,7 +134,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='informal_description'>informal_description</h1><a name='informal_description'/>
+<h2 id='informal_description'>informal_description</h1><a name='informal_description'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -145,7 +145,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='informal_description_subject'>informal_description_subject</h1><a name='informal_description_subject'/>
+<h2 id='informal_description_subject'>informal_description_subject</h1><a name='informal_description_subject'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -161,14 +161,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='informal_description_body'>informal_description_body</h1><a name='informal_description_body'/>
+<h2 id='informal_description_body'>informal_description_body</h1><a name='informal_description_body'/>
 <script>
 ComplexDiagram(
   Sequence('any text', NonTerminal('fullstop-at-end-of-line'))
 ).addTo();
 </script>
 
-<h1 id='object_type'>object_type</h1><a name='object_type'/>
+<h2 id='object_type'>object_type</h1><a name='object_type'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -178,7 +178,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='value_type'>value_type</h1><a name='value_type'/>
+<h2 id='value_type'>value_type</h1><a name='value_type'/>
 <script>
 ComplexDiagram(
   Stack(
@@ -214,7 +214,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='value_type_parameters'>value_type_parameters</h1><a name='value_type_parameters'/>
+<h2 id='value_type_parameters'>value_type_parameters</h1><a name='value_type_parameters'/>
 <script>
 ComplexDiagram(
   Optional(Sequence(
@@ -228,7 +228,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='parameter'>parameter</h1><a name='parameter'/>
+<h2 id='parameter'>parameter</h1><a name='parameter'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -238,7 +238,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='named_parameter'>named_parameter</h1><a name='named_parameter'/>
+<h2 id='named_parameter'>named_parameter</h1><a name='named_parameter'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -282,7 +282,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='parameter_literal'>parameter_literal</h1><a name='parameter_literal'/>
+<h2 id='parameter_literal'>parameter_literal</h1><a name='parameter_literal'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -292,7 +292,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='parameter_restriction'>parameter_restriction</h1><a name='parameter_restriction'/>
+<h2 id='parameter_restriction'>parameter_restriction</h1><a name='parameter_restriction'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -305,14 +305,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='auto_assignment'>auto_assignment</h1><a name='auto_assignment'/>
+<h2 id='auto_assignment'>auto_assignment</h1><a name='auto_assignment'/>
 <script>
 ComplexDiagram(
   Sequence('auto-assigned', 'at', Choice(0, 'assert', 'commit'))
 ).addTo();
 </script>
 
-<h1 id='unit_definition'>unit_definition</h1><a name='unit_definition'/>
+<h2 id='unit_definition'>unit_definition</h1><a name='unit_definition'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -347,7 +347,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='unit_coefficient'>unit_coefficient</h1><a name='unit_coefficient'/>
+<h2 id='unit_coefficient'>unit_coefficient</h1><a name='unit_coefficient'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -357,7 +357,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='unit_offset'>unit_offset</h1><a name='unit_offset'/>
+<h2 id='unit_offset'>unit_offset</h1><a name='unit_offset'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -367,7 +367,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='units'>units</h1><a name='units'/>
+<h2 id='units'>units</h1><a name='units'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -386,7 +386,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='entity_type'>entity_type</h1><a name='entity_type'/>
+<h2 id='entity_type'>entity_type</h1><a name='entity_type'/>
 <script>
 ComplexDiagram(
   Stack(
@@ -416,7 +416,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='supertype_list'>supertype_list</h1><a name='supertype_list'/>
+<h2 id='supertype_list'>supertype_list</h1><a name='supertype_list'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -430,7 +430,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='identification'>identification</h1><a name='identification'/>
+<h2 id='identification'>identification</h1><a name='identification'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -450,7 +450,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='role_list'>role_list</h1><a name='role_list'/>
+<h2 id='role_list'>role_list</h1><a name='role_list'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -465,7 +465,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='term_or_unary'>term_or_unary</h1><a name='term_or_unary'/>
+<h2 id='term_or_unary'>term_or_unary</h1><a name='term_or_unary'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -484,7 +484,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='mapping_pragmas'>mapping_pragmas</h1><a name='mapping_pragmas'/>
+<h2 id='mapping_pragmas'>mapping_pragmas</h1><a name='mapping_pragmas'/>
 <script>
 ComplexDiagram(
   Optional(
@@ -502,7 +502,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='mapping_pragma'>mapping_pragma</h1><a name='mapping_pragma'/>
+<h2 id='mapping_pragma'>mapping_pragma</h1><a name='mapping_pragma'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -513,7 +513,7 @@ ComplexDiagram(
 </script>
 
 
-<h1 id='query'>query</h1><a name='query'/>
+<h2 id='query'>query</h1><a name='query'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -524,7 +524,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='fact_type'>fact_type</h1><a name='fact_type'/>
+<h2 id='fact_type'>fact_type</h1><a name='fact_type'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -539,7 +539,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='anonymous_fact_type'>anonymous_fact_type</h1><a name='anonymous_fact_type'/>
+<h2 id='anonymous_fact_type'>anonymous_fact_type</h1><a name='anonymous_fact_type'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -554,7 +554,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='query_clauses'>query_clauses</h1><a name='query_clauses'/>
+<h2 id='query_clauses'>query_clauses</h1><a name='query_clauses'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -567,7 +567,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='returning_clause'>returning_clause</h1><a name='returning_clause'/>
+<h2 id='returning_clause'>returning_clause</h1><a name='returning_clause'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -583,14 +583,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='ordering_prefix'>ordering_prefix</h1><a name='ordering_prefix'/>
+<h2 id='ordering_prefix'>ordering_prefix</h1><a name='ordering_prefix'/>
 <script>
 ComplexDiagram(
   Choice(0, 'ascending', 'descending')
 ).addTo();
 </script>
 
-<h1 id='qualified_clauses'>qualified_clauses</h1><a name='qualified_clauses'/>
+<h2 id='qualified_clauses'>qualified_clauses</h1><a name='qualified_clauses'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -602,7 +602,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='certainty'>certainty</h1><a name='certainty'/>
+<h2 id='certainty'>certainty</h1><a name='certainty'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -614,7 +614,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='post_qualifiers'>post_qualifiers</h1><a name='post_qualifiers'/>
+<h2 id='post_qualifiers'>post_qualifiers</h1><a name='post_qualifiers'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -628,7 +628,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='post_qualifier'>post_qualifier</h1><a name='post_qualifier'/>
+<h2 id='post_qualifier'>post_qualifier</h1><a name='post_qualifier'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -647,7 +647,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='clauses_list'>clauses_list</h1><a name='clauses_list'/>
+<h2 id='clauses_list'>clauses_list</h1><a name='clauses_list'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -660,7 +660,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='clauses'>clauses</h1><a name='clauses'/>
+<h2 id='clauses'>clauses</h1><a name='clauses'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -673,7 +673,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='contracted_clauses'>contracted_clauses</h1><a name='contracted_clauses'/>
+<h2 id='contracted_clauses'>contracted_clauses</h1><a name='contracted_clauses'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -687,7 +687,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='contraction'>contraction</h1><a name='contraction'/>
+<h2 id='contraction'>contraction</h1><a name='contraction'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -697,7 +697,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='reading_contraction'>reading_contraction</h1><a name='reading_contraction'/>
+<h2 id='reading_contraction'>reading_contraction</h1><a name='reading_contraction'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -710,7 +710,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='comparison_contraction'>comparison_contraction</h1><a name='comparison_contraction'/>
+<h2 id='comparison_contraction'>comparison_contraction</h1><a name='comparison_contraction'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -723,14 +723,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='comparator'>comparator</h1><a name='comparator'/>
+<h2 id='comparator'>comparator</h1><a name='comparator'/>
 <script>
 ComplexDiagram(
   Choice(3, '<=', '<>', '<', '=', '>=', '>', '!=')
 ).addTo();
 </script>
 
-<h1 id='comparison'>comparison</h1><a name='comparison'/>
+<h2 id='comparison'>comparison</h1><a name='comparison'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -743,7 +743,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='linking_word'>linking_word</h1><a name='linking_word'/>
+<h2 id='linking_word'>linking_word</h1><a name='linking_word'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -753,7 +753,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='noun_phrase'>noun_phrase</h1><a name='noun_phrase'/>
+<h2 id='noun_phrase'>noun_phrase</h1><a name='noun_phrase'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -763,7 +763,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='aggregate'>aggregate</h1><a name='aggregate'/>
+<h2 id='aggregate'>aggregate</h1><a name='aggregate'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -777,14 +777,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='aggregate_operation'>aggregate_operation</h1><a name='aggregate_operation'/>
+<h2 id='aggregate_operation'>aggregate_operation</h1><a name='aggregate_operation'/>
 <script>
 ComplexDiagram(
   NonTerminal('id'),
 ).addTo();
 </script>
 
-<h1 id='simple_noun_phrase'>simple_noun_phrase</h1><a name='simple_noun_phrase'/>
+<h2 id='simple_noun_phrase'>simple_noun_phrase</h1><a name='simple_noun_phrase'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -806,7 +806,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='role_quantifier'>role_quantifier</h1><a name='role_quantifier'/>
+<h2 id='role_quantifier'>role_quantifier</h1><a name='role_quantifier'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -818,7 +818,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='objectification_step'>objectification_step</h1><a name='objectification_step'/>
+<h2 id='objectification_step'>objectification_step</h1><a name='objectification_step'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -829,7 +829,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='role_name'>role_name</h1><a name='role_name'/>
+<h2 id='role_name'>role_name</h1><a name='role_name'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -840,7 +840,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='subscript'>subscript</h1><a name='subscript'/>
+<h2 id='subscript'>subscript</h1><a name='subscript'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -851,7 +851,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='quantifier'>quantifier</h1><a name='quantifier'/>
+<h2 id='quantifier'>quantifier</h1><a name='quantifier'/>
 <script>
 ComplexDiagram(
   Choice(3,
@@ -877,7 +877,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='quantity'>quantity</h1><a name='quantity'/>
+<h2 id='quantity'>quantity</h1><a name='quantity'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -887,14 +887,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='expression'>expression</h1><a name='expression'/>
+<h2 id='expression'>expression</h1><a name='expression'/>
 <script>
 ComplexDiagram(
   NonTerminal('sum', {href: '#sum'})
 ).addTo();
 </script>
 
-<h1 id='sum'>sum</h1><a name='sum'/>
+<h2 id='sum'>sum</h1><a name='sum'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -907,7 +907,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='product'>product</h1><a name='product'/>
+<h2 id='product'>product</h1><a name='product'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -920,7 +920,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='factor'>factor</h1><a name='factor'/>
+<h2 id='factor'>factor</h1><a name='factor'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -931,7 +931,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='variable'>variable</h1><a name='variable'/>
+<h2 id='variable'>variable</h1><a name='variable'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -944,7 +944,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='value_constraint'>value_constraint</h1><a name='value_constraint'/>
+<h2 id='value_constraint'>value_constraint</h1><a name='value_constraint'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -961,7 +961,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='range_list'>range_list</h1><a name='range_list'/>
+<h2 id='range_list'>range_list</h1><a name='range_list'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -975,7 +975,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='presence_constraint'>presence_constraint</h1><a name='presence_constraint'/>
+<h2 id='presence_constraint'>presence_constraint</h1><a name='presence_constraint'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -985,7 +985,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='each_occurs_in_clauses'>each_occurs_in_clauses</h1><a name='each_occurs_in_clauses'/>
+<h2 id='each_occurs_in_clauses'>each_occurs_in_clauses</h1><a name='each_occurs_in_clauses'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1000,7 +1000,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='either_or'>either_or</h1><a name='either_or'/>
+<h2 id='either_or'>either_or</h1><a name='either_or'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1015,7 +1015,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='set_constraint'>set_constraint</h1><a name='set_constraint'/>
+<h2 id='set_constraint'>set_constraint</h1><a name='set_constraint'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1025,7 +1025,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='for_each_how_many'>for_each_how_many</h1><a name='for_each_how_many'/>
+<h2 id='for_each_how_many'>for_each_how_many</h1><a name='for_each_how_many'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1042,7 +1042,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='either_or_not_both'>either_or_not_both</h1><a name='either_or_not_both'/>
+<h2 id='either_or_not_both'>either_or_not_both</h1><a name='either_or_not_both'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1058,7 +1058,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='subset_constraint'>subset_constraint</h1><a name='subset_constraint'/>
+<h2 id='subset_constraint'>subset_constraint</h1><a name='subset_constraint'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1068,7 +1068,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='a_only_if_b'>a_only_if_b</h1><a name='a_only_if_b'/>
+<h2 id='a_only_if_b'>a_only_if_b</h1><a name='a_only_if_b'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1082,7 +1082,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='if_b_then_a'>if_b_then_a</h1><a name='if_b_then_a'/>
+<h2 id='if_b_then_a'>if_b_then_a</h1><a name='if_b_then_a'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1097,14 +1097,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='equality_constraint'>equality_constraint</h1><a name='equality_constraint'/>
+<h2 id='equality_constraint'>equality_constraint</h1><a name='equality_constraint'/>
 <script>
 ComplexDiagram(
         'if_and_only_if'
 ).addTo();
 </script>
 
-<h1 id='if_and_only_if'>if_and_only_if</h1><a name='if_and_only_if'/>
+<h2 id='if_and_only_if'>if_and_only_if</h1><a name='if_and_only_if'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1118,14 +1118,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='enforcement'>enforcement</h1><a name='enforcement'/>
+<h2 id='enforcement'>enforcement</h1><a name='enforcement'/>
 <script>
 ComplexDiagram(
   Optional(Sequence('(', 'otherwise', NonTerminal('id'), Optional(NonTerminal('agent', {href: '#id'})), ')'))
 ).addTo();
 </script>
 
-<h1 id='context_note'>context_note</h1><a name='context_note'/>
+<h2 id='context_note'>context_note</h1><a name='context_note'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1144,14 +1144,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='agents'>agents</h1><a name='agents'/>
+<h2 id='agents'>agents</h1><a name='agents'/>
 <script>
 ComplexDiagram(
   OneOrMore(NonTerminal('agent', {href: '#id'}))
 ).addTo();
 </script>
 
-<h1 id='description'>description</h1><a name='description'/>
+<h2 id='description'>description</h1><a name='description'/>
 <script>
 ComplexDiagram(
   Choice(1,
@@ -1161,7 +1161,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='as_agreed_by'>as_agreed_by</h1><a name='as_agreed_by'/>
+<h2 id='as_agreed_by'>as_agreed_by</h1><a name='as_agreed_by'/>
 <script>
 ComplexDiagram(
   Sequence('as', 'agreed',
@@ -1173,7 +1173,7 @@ ComplexDiagram(
 </script>
 
 
-<h1 id='term'>term</h1><a name='term'/>
+<h2 id='term'>term</h1><a name='term'/>
 <p>An object type name is one or more words (ids) which may not contain a hyphen.
 </p><p>
 A term also allows zero or more leading adjectives and/or trailing adjectives.
@@ -1240,7 +1240,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='hyphenated_adj'>hyphenated_adj</h1><a name='hyphenated_adj'/>
+<h2 id='hyphenated_adj'>hyphenated_adj</h1><a name='hyphenated_adj'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1250,7 +1250,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='range'>range</h1><a name='range'/>
+<h2 id='range'>range</h1><a name='range'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1260,7 +1260,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='numeric_range'>numeric_range</h1><a name='numeric_range'/>
+<h2 id='numeric_range'>numeric_range</h1><a name='numeric_range'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1272,7 +1272,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='string_range'>string_range</h1><a name='string_range'/>
+<h2 id='string_range'>string_range</h1><a name='string_range'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1284,7 +1284,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='literal'>literal</h1><a name='literal'/>
+<h2 id='literal'>literal</h1><a name='literal'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1295,14 +1295,14 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='boolean_literal'>boolean_literal</h1><a name='boolean_literal'/>
+<h2 id='boolean_literal'>boolean_literal</h1><a name='boolean_literal'/>
 <script>
 ComplexDiagram(
   Choice(0, 'false', 'true')
 ).addTo();
 </script>
 
-<h1 id='string'>string</h1><a name='string'/>
+<h2 id='string'>string</h1><a name='string'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1313,7 +1313,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='string_char'>string_char</h1><a name='string_char'/>
+<h2 id='string_char'>string_char</h1><a name='string_char'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1328,7 +1328,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='number'>number</h1><a name='number'/>
+<h2 id='number'>number</h1><a name='number'/>
 <script>
 ComplexDiagram(
   Choice(0,
@@ -1340,7 +1340,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='real'>real</h1><a name='real'/>
+<h2 id='real'>real</h1><a name='real'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1353,7 +1353,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='fractional_real'>fractional_real</h1><a name='fractional_real'/>
+<h2 id='fractional_real'>fractional_real</h1><a name='fractional_real'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1365,7 +1365,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='fraction'>fraction</h1><a name='fraction'/>
+<h2 id='fraction'>fraction</h1><a name='fraction'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1375,7 +1375,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='exponent'>exponent</h1><a name='exponent'/>
+<h2 id='exponent'>exponent</h1><a name='exponent'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1386,7 +1386,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='hexnumber'>hexnumber</h1><a name='hexnumber'/>
+<h2 id='hexnumber'>hexnumber</h1><a name='hexnumber'/>
 <script>
 ComplexDiagram(
   Sequence(
@@ -1396,7 +1396,7 @@ ComplexDiagram(
 ).addTo();
 </script>
 
-<h1 id='octalnumber'>octalnumber</h1><a name='octalnumber'/>
+<h2 id='octalnumber'>octalnumber</h1><a name='octalnumber'/>
 <script>
 ComplexDiagram(
   Sequence(

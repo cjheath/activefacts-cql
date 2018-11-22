@@ -10,11 +10,32 @@
 <link rel="stylesheet" href="css/style.css" media="screen" type="text/css" />
 <link rel="stylesheet" href="css/screen.css" media="screen" type="text/css" />
 <!--[if lte IE 6]>
-  <link rel="stylesheet" href="/css/screen.ie6.css" media="screen" type="text/css" />
+  <link rel="stylesheet" href="css/screen.ie6.css" media="screen" type="text/css" />
 <![endif]-->
 <link rel="stylesheet" href="css/print.css" media="print" type="text/css" />
 <link rel="stylesheet" href="css/railroad-diagrams.css">
 <link rel="stylesheet" href="css/local.css" media="screen" type="text/css" />
+<style>
+body svg.railroad-diagram {
+	background-color: hsl(30,20%, 95%);
+}
+h2 {
+	font-family: sans-serif;
+	font-size: 1em;
+}
+svg.railroad-diagram path,
+svg.railroad-diagram rect
+{
+	stroke-width: 2px;
+}
+.railroad-diagram .terminal text {
+	fill: #44F;
+}
+div svg.railroad-diagram {
+	width: 80%;  /* Scale to the width of the parent */
+	height: 100%;  /* Preserve the ratio. Could be related to https://bugs.webkit.org/show_bug.cgi?id=82489 */
+}
+</style>
 </head>
 <body>
 
