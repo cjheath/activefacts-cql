@@ -1,5 +1,0 @@
-module ActiveFacts
-  module CQL
-    VERSION = "1.9.7"
-  end
-end
