@@ -1,0 +1,9 @@
+Gemfile.lock
+*.cql
+clj/
+doc/
+*.forml
+lib/
+pkg/
+*.patch
+spec/
