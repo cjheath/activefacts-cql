@@ -11,7 +11,8 @@ body
 em,
 blockquote
 {
-  font-family      : Cambria, Georgia, serif;
+  font-family	    : Cambria, Georgia, serif;
+  font-size	    : larger;
 }
 
 /* headings */

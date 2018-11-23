@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>CQL Introduction</title>
 <meta name="description" content="CQL Introduction" />
-<meta name="keywords" content="infinuendo, data constellation,information management,semantic modelling,activefacts" />
+<meta name="keywords" content="fact based modeling, fact based modelling, data constellation, information management, semantic modelling,activefacts" />
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
 <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 <link rel="stylesheet" href="css/style.css" media="screen" type="text/css" />
@@ -57,535 +57,472 @@ div svg.railroad-diagram {
 	height: 100%;  /* Preserve the ratio. Could be related to https://bugs.webkit.org/show_bug.cgi?id=82489 */
 }
 </style>
-<script src='railroad-diagrams.js'></script>
+<script src='js/railroad-diagrams.js'></script>
 
 <!--title>Introduction to the</title-->
 <h1>
 Introduction to the Constellation Query Language
 </h1>
-<p>The Constellation Query Language (<b>CQL</b>) is a language for
-constructing and querying fact-based information models. It is based
-on the graphical <a href="#ftn1" title="ORM Foundation">
-<b>Object Role Modeling</b></a> language, with some terminology
-adopted from the <a href="#ftn2" title="SBVR"><b>Semantics of
-Business Vocabulary and Business Rules</b></a>.</p>
+<p>The Constellation Query Language (<strong>CQL</strong>) is a language for constructing and querying
+<strong>fact-based information models</strong>. It is a textual representation of the graphical
+<a href="#ftn1" title="ORM Foundation"><strong>Object Role Modeling</strong></a> language, which
+fully implements semantics isomorphic to Codd's Relational Calculus.
+</p>
 
-<p>Because CQL has an open vocabulary, and because it is designed to
-resemble natural language, the formal grammar has potential ambiguities.
-Most of these ambiguities can be automatically resolved, and the
-resolutions will become obvious as the syntax rules unfold.  As
-described here, CQL uses English language keywords and expressions,
-though variants of CQL are being defined that substitute keywords and
-expressions from other languages. Some of these keywords are disallowed
-as open vocabulary, where they would create unresolvable ambiguities.
-This includes all the logical operators, such as <tt>and</tt>, <tt>or</tt>, <tt>maybe</tt>,
-<tt>not</tt>, <tt>none</tt>, <tt>no</tt>, <tt>only if</tt>, etc. Other keywords such as <tt>is</tt>,
-<tt>identified</tt>, <tt>kind</tt>, <tt>of</tt>, <tt>as</tt>, <tt>at</tt>, etc, are allowed to be used anywhere
-open vocabulary is allowed, and their special meaning applies only in
-the specific places noted.</p>
+<h5>Open Vocabulary</h5>
 
-<p>CQL is <em>case sensitive</em>. <tt>Person</tt> is not the same
-thing as <tt>person</tt>. It's conventional, though not required, to
-use a capital letter for all object type names.
-White space and comments as used in C and C++ are allowed:
+<p>
+CQL has an open vocabulary (almost any linking words or expressions may be used in defining fact types)
+because it is designed to resemble natural language. Only certain key words and key phrases are restricted.
+Some keywords are disallowed in any open text, because they always have their special meaning,
+whereas others are only special in certain contexts.
+In most cases the individual words of key phrases are not restricted; only the complete phrase is special.
+CQL allows free use of whitespace and comments, even in the middle of key phrases.
+</p>
+
+<h5>Keywords and phrases</h5>
+
+<p>
+This introduction to CQL uses English language keywords and phrases,
+though CQL also has variants in other natural languages.
+
+Keywords that are special everywhere include the logical operators, such as
+<tt>and</tt>, <tt>or</tt>, <tt>maybe</tt>, <tt>not</tt>, <tt>none</tt>, <tt>no</tt>, <tt>if</tt>,
+and designators like
+<tt>some</tt>, <tt>that</tt>, etc.
+
+Other words of key phrases such as <tt>is</tt>, <tt>identified</tt>, <tt>kind</tt>, <tt>of</tt>,
+<tt>as</tt>, <tt>at</tt>, etc, may be used anywhere open vocabulary is allowed.
+Their special meaning applies only in the specific places they appear in the grammar.
+</p>
+
+<p>
+CQL statement are parsed by first identifying key expressions and terms while skipping the linking text.
+Next, each clause is matched to a fact type by using the linking text and the object types indicated,
+and the whole expression is then analysed.
+</p>
+
+<h5>Case and Whitespace</h5>
+
+<p>
+CQL is <em>case sensitive</em>. <tt>Person</tt> is not the same thing as <tt>person</tt>.
+It's convenient however to use a capital letter for the names of all object types (called <strong>terms</strong>,
+because the specific sequence of words in an object type name will <em>always</em> designate that
+object type, and sometimes the lower-cased version of a name will appear in linking text.
+</p>
+
+<p>
+White space and comments as similar to C and C++:
 <tt>/*&nbsp;comment<br>may&nbsp;span&nbsp;lines&nbsp;*/</tt> and
 <tt>//&nbsp;introduces&nbsp;a&nbsp;comment&nbsp;to&nbsp;end&nbsp;of&nbsp;the&nbsp;current&nbsp;line.</tt>
 </p>
 
+<h5>Data types and values</h5>
+
 <p>
-Parsing a CQL statement consists of identifying recognised expressions and
-terms (with any applicable adjectives) while ignoring the residual predicate text.
-The combination of the object types (as designated by terms) and the predicate
-text is used to designate fact types.
+CQL requires lexical support for only a rudimentary set of data types and literals;
+boolean (true/false), numbers (integer, real, scientific), character strings, and
+ranges of numbers and strings (ranges may be open at either end).
 </p>
 
 <p>
-At a lexical level, CQL supports the full range of primitive data types commonly found in modern programming languages including BOOLEAN, STRING, DECIMAL, REAL, EXPONENTIAL.  CQL suports expressions on these primitive data types.  Full details of the lexical and expression rules are contained in the Lexical Rules section below.  
+Data types can be refined through the use of parameters to match concrete types
+available in typical target data environments and languages, and code generators
+will assume reasonable defaults even without that.  You can also define entirely
+new data types and their parameters, for use in specialised code generators or
+where a target language has a data type that is not special in the code generators.
+The syntax for value literals is near the end of this document.
 </p>
 
-<h2>CQL Model</h2>
+<h5>CQL Schema</h5>
 
-<p>A fact-based model (known in CQL as a <b>vocabulary</b>) comprises definitions of the following kinds:</p>
+<p> Every CQL file must begin with a schema definition statement,
+then may import (all or part of) other schemas, before starting
+new definitions.
+</p>
+
+<h5>Kinds of CQL definition</h5>
 
 <ul type="disc">
-
-<li><b>Object Types</b> are designated by name. Objects types include <b>value types</b>, <b>entity types</b>
-and <b>named fact types</b>.
+<li>
+Every <strong>Object Type</strong> has a name (a <strong>Term</strong>) consisting of one or more words.
+Each word starts with a letter and continues with any alphanumeric or underscore characters.
+A Term may be a prefix of another Term, but may not overlap (end with a suffix that's a prefix of another Term).
 </li>
 
-<li><b>Fact Types</b> are designated by one or more <b>readings</b>.
-Fact types declare a relationship between object types,
-or a boolean property of a single object type.
-A fact type may be designated by a name (objectified),
-which allows its use as an object type in other fact types.
-A fact type may be derived from a query, analogous to an SQL view.
+<li>
+Every instance of an object type is <strong>distinguishable</strong> (intrinsically identifiable),
+such that any copy always refers to the same instance. There is no mechanism for
+extrinsic identification as in many object-oriented languages.
+This idea is critical to the application of formal logic - individual things must be identifiable
+even when there are multiple references to them.
 </li>
 
-<li><b>Constraints</b> which restrict the allowed object instances
-and facts within a valid <b>population</b>.</li>
-
-<li><b>Instances</b> of object types and fact types as examples
-or as reference data.
+<li>A <strong>Value Type</strong> is an Object Type defined using the key phase <strong>is written as</strong>,
+since value instances are distinguished by a written form.
 </li>
 
-<li><b>Units</b> used to automate value conversion.</li>
+<li>An <strong>Entity Type</strong> is an Object Type of which each instance is distinguished by
+roles in its <em>existential</em> facts. The ultimate identifier of an entity instance will be
+a set of value instances that play these roles (but this may be indirect).
+The key phase <strong>is identified by</strong> is the most common way to introduce an entity type.
+</li>
 
+<li>A <strong>Named Object Type</strong> is an Entity Type which is the objectification of one Fact Type.
+Each instance exists as one instance of a Fact of that Type. The key phrase is <strong>is where</strong>,
+e.g. <em>Directorship <strong>is where</strong> some Person directs some Company</em>.
+Each instance of the Object Type is identified by the unique roles in the fact,
+but an alternate identifier may be preferred.
+</li>
+
+<li>A <strong>Subtype</strong> is an Entity Type which is a sub-type of some other Entity Type
+(or perhaps even more than one) introduced by the key phrase <strong>is a kind of</strong>.
+Every instance of a subtype is also an instance of its supertype, and so is identifiable
+the same way, though a subtype may introduce a new preferred identification scheme as well.
+</li>
+
+<li>A <strong>Fact Type</strong> declares the possibility of a specific relationship between
+instances of two or more object types, or a characteristic of an instance of a single object type.
+The Fact Type does this by providing one or more <strong>readings</strong> which are phrases
+that include linking words and the object type names. Linking words may occur at the start
+or end of a reading, and it is common for a fact type to have multiple readings, usually with
+the object types in a different order.
+</li>
+
+<li>
+A Fact instance must have exactly one object instance compatible with each such role of
+its object types. The Fact cannot be asserted if it has any missing object instances;
+nothing resembling an SQL NULL is possible.
+</li>
+
+<li>A <strong>Derived Fact Type</strong> is a Fact Type whose member instances may be computed
+from a logical expression over other facts (analogous to an SQL view). A Derived Fact Type may
+be fully derived (all instances are derived) or semi-derived (some instances are derived,
+others may be asserted). Entity subtyping may also be derived, in a similar fashion.
+</li>
+
+<li>A <strong>Constraint</strong> restricts the instances of objects and facts that are
+possible (alethic) or permissable (deontic) in a valid <strong>Population</strong>.
+Instances that break deontic constraints may be asserted, but are associated with some
+enforcement action introduced by a parenthesised expression starting with the keyword <strong>otherwise</strong>.
+There are many types of constraints, as you will see below.
+</li>
+
+<li>An <strong>Instance</strong> of an object type or fact type, including at least the
+literal values to identify the instance. It is common for a single instance expression to
+define multiple fact and object instances. Each instance belongs to one <strong>Population</strong>.
+The default anonymous population is the <strong>seed</strong> data for the model, meaning
+that these instances must be present in any operational system, often as reference data.
+Other populations may define example data or specific test case scenarios.
+</li>
+
+<li>A <strong>Unit</strong> definition can provide automated conversion between numeric values,
+including for ephemeral conversions like currency exchange rates, by reference to an external
+source of the ephemera.
+</li>
 </ul>
 
-<p>A CQL file must start with a vocabulary definition,
-and may import elements from one or more other vocabularies.</p>
+<p>A CQL file must start with a schema definition:</p>
 
 <dl>
-  <dt>statement:</dt>
-  <dd>
-	  <script>
-		Diagram(
-			Choice(0,
-				Sequence(
-					NonTerminal('definition'),
-					"';'"
-				),
-				Sequence(
-					NonTerminal('query'),
-					"'?'"
-				)
-			)
-		).addTo();
-	  </script>
-  <dt>definition:</dt>
-  <dd>
-	  <script>
-	  Diagram(
-	    Choice(0, 
-	      Sequence("'vocabulary'", 'ID'), 
-	      NonTerminal('import_def'),
-	      NonTerminal('object_type'),
-		  NonTerminal('fact_type'),
-	      NonTerminal('constraint'),
-	      NonTerminal('unit_def')
-	  )).addTo();
-	  </script>
-  </dd>
+<dt id='cql_file'>cql_file</dt>
+<dd><script src="js/diagrams/cql_file.js"></a></script></dd>
+
+<dt id='definition'>definition<a name='definition'></a></dt>
+<dd><script src="js/diagrams/definition.js"></a></script></dd>
+
+<dt id='schema_definition'>schema_definition<a name='schema_definition'></a></dt>
+<dd><script src="js/diagrams/schema_definition.js"></a></script></dd>
+
+<dt id='schema_name'>schema_name<a name='schema_name'></a></dt>
+<dd><script src="js/diagrams/schema_name.js"></a></script></dd>
+
+<dt id='version_number'>version_number<a name='version_number'></a></dt>
+<dd><script src="js/diagrams/version_number.js"></a></script></dd>
 </dl>
 
 <p>An import definition imports object type names from another
-vocabulary, possibly using the <b>alias</b> syntax to rename some
+schema, possibly using the <b>alias</b> syntax to rename some
 terms. In addition, fact type readings from the imported vocabulary
 may subsequently be included in new definitions which provide
 translations specific to this vocabulary.</p>
 
 <dl>
-  <dt>import_def:</dt>
-  <dd>
-	  <script>
-	  Diagram(
-	    Sequence(
-	      "'import'",
-	      'ID',
-	      ZeroOrMore(
-	          Sequence(
-	              "','", "'alias'", 'ID', "'as'", 'ID'
-	          )
-	      )
-	  )).addTo();
-	  </script>
-  </dd>
+<dt id='import_definition'>import_definition<a name='import_definition'></a></dt>
+<dd><script src="js/diagrams/import_definition.js"></a></script></dd>
+
+<dt id='version_pattern'>version_pattern<a name='version_pattern'></a></dt>
+<dd><script src="js/diagrams/version_pattern.js"></a></script></dd>
+
+<dt id='alias_list'>alias_list<a name='alias_list'></a></dt>
+<dd><script src="js/diagrams/alias_list.js"/></script></dd>
 </dl>
 
-<h2>Object Types</h2>
-
 <p>
-An object type represents a type of thing that can be perceived or conceived.
-Each object type has at least one name (or <b>term</b>), and the word
-object type as used throughout this document implies the use of one of these
-terms. An object type definition starts with its name, and is one of the
-following kinds.  Names in CQL are case sensitive, and it&rsquo;s
-conventional practice to use initial capital letters for object type names
-(this is required in Object Role Modeling but not in CQL).  It is however
-a good way of allowing object type names to be to be distinguished from the
-same words in lower case, where they may occur in fact type readings.
+Other definitions and informal descriptions may follow:
 </p>
+<dl>
+<dt id='statement'>statement<a name='statement'></a></dt>
+<dd><script src="js/diagrams/statement.js"/></script></dd>
+<dt id='informal_description'>informal_description<a name='informal_description'></a></dt>
+<dd><script src="js/diagrams/informal_description.js"/></script></dd>
+<dt id='informal_description_subject'>informal_description_subject<a name='informal_description_subject'></a></dt>
+<dd><script src="js/diagrams/informal_description_subject.js"/></script></dd>
+<dt id='informal_description_body'>informal_description_body<a name='informal_description_body'></a></dt>
+<dd><script src="js/diagrams/informal_description_body.js"/></script></dd>
+</dl>
+
+<h3>Object Types</h3>
 
 <dl>
-  <dt>object type:
-  <dd>
-  <script>
-  Diagram(
-    Choice(0,
-     NonTerminal('value_type'),
-     NonTerminal('entity_type'),
-     NonTerminal('named_fact_type')
-  )).addTo();
-  </script>
+<dt id='object_type'>object_type<a name='object_type'></a></dt>
+<dd><script src="js/diagrams/object_type.js"/></script></dd>
 </dl>
 
 <h3>Value Types</h3>
 
 <p>A Value Type is a kind of thing which has a single value that may be
-written down, that is, a lexical type, like a number, a name, a date,
-etc.
+written down, that is, a lexical type, like a number, a name, a date, etc.
+CQL literals may provide more than one way to write the same thing,
+for example the integer 16 may be written as the hexadecimal 0x10, but
+the uniqueness of these is determined by the underlying canonical value.
 </p>
 
 <p>
-A value type is usually derived from another value type, where top-level
-value types are defined in an imported vocabulary.  A value type may
-refine its supertype by the use of <b>length</b> and <b>scale</b>
-parameters where relevant. (The ability to define custom parameters is
-anticipated in a revision of the language.) A value restriction might
-also limit the allowable values from those allowed by the supertype;
-these restrictions are discussed below.
+A value type is usually derived from another value type, whether or not that value type
+has been defined in an imported vocabulary. A top-level value type is merely one whose
+existence is presumed, or is written as itself in a circular fashion.
+Many top-level names are detected and handled by code generators that receive CQL,
+but CQL itself does not do this.
+</p>
+
+<p>
+A value type may define named parameters, and may assign or restrict parameter values.
+For legacy reasons, there are two positional parameters called <b>length</b> and <b>scale</b>.
+</p>
+
+<p>
+A numeric literal or a Value Type may be assigned a specific unit of measure
+</p>
+
+<p>
+A value type value constraint can restrict the allowable values from those
+allowed by the supertype.
 </p>
 
 <dl>
-  <dt>value_type:
-  <dd>
-	  <script>
-	  Diagram(
-	    Sequence(
-		  Optional("'each'"),
-	      'ID',
-	      "'is written as'",
-		  Optional("'any'"),
-	    'ID',
-	    Optional(NonTerminal('vt_parameters')),
-	    Optional(NonTerminal('value_constaint'))
-	  )).addTo();
-	  </script>
-  <dt>vt_parameters:
-  <dd>
-	  <script>
-	  Diagram(
-		  Optional(
-		    Sequence(
-			   "'('",
-			   NonTerminal('number'),
-			   ZeroOrMore(
-			   	Sequence("','", NonTerminal('number'))
-			   ),
-			   "')'"
-		   )
-	  )).addTo();
-	  </script>
+<dt id='value_type'>value_type<a name='value_type'></a></dt>
+<dd><script src="js/diagrams/value_type.js"/></script></dd>
+<dt id='value_type_parameters'>value_type_parameters<a name='value_type_parameters'></a></dt>
+<dd><script src="js/diagrams/value_type_parameters.js"/></script></dd>
+<dt id='auto_assignment'>auto_assignment<a name='auto_assignment'></a></dt>
+<dd><script src="js/diagrams/auto_assignment.js"/></script></dd>
+<dt id='parameter'>parameter<a name='parameter'></a></dt>
+<dd><script src="js/diagrams/parameter.js"/></script></dd>
+<dt id='named_parameter'>named_parameter<a name='named_parameter'></a></dt>
+<dd><script src="js/diagrams/named_parameter.js"/></script></dd>
+<dt id='parameter_restriction'>parameter_restriction<a name='parameter_restriction'></a></dt>
+<dd><script src="js/diagrams/parameter_restriction.js"/></script></dd>
+<dt id='parameter_literal'>parameter_literal<a name='parameter_literal'></a></dt>
+<dd><script src="js/diagrams/parameter_literal.js"/></script></dd>
 </dl>
 
-<p>
-Top-level value types are defined by self-reference, e.g.
-</p>
+<h5> Examples </h5>
 <pre>
-Integer is written as Integer;
-</pre>
-<p>
-or implicitly by being used as a supertype for another value type.
-However, top-level types must be known to any underlying mapping
-layer, such as a procedural language or relational database, in
-order to be used with that layer.
-</p>
-
-<p>Continuing the examples from an model from the Insurance industry:</p>
-
-<pre>
-Name is written as String(256);
-Price is written as Decimal(18,2);
+each Month Nr is written as an Integer restricted to {1..12};
+each Currency Amount is written as a Decimal(Precision: 14, Scale: 2);
+each Name is written as a String(64, accepts Encoding as String restricted to {'ASCII', 'UTF-8'});
+each Claim Sequence Nr is written as an Integer restricted to {1..999};
+each Contact Method is written as a Char(1) restricted to {'B', 'H', 'M'};
+each Glass Area is written as an Integer in mm^2;
+each Acceleration is written as a Real in m/s^2;
 </pre>
 
-Restrictions can be placed on the values taken by value types.
+<h3>Units</h3>
+<p>
+A unit definition defines a conversion to and from other more fundamental units, such as metres or kilowatt-hours.
+</p>
 
 <dl>
-<dt>value_constraint:
-<dd>
-	<script>
-	Diagram(
-	   Sequence(
-	      "'restricted to'",
-	      "'{'",
-	      NonTerminal('range'),
-	      ZeroOrMore(
-	         Sequence(
-	            "','",
-	            NonTerminal('range')
-	         )
-	      ),
-	     "'}'"
-	 )).addTo();
-	</script>
-<dt>range:
-<dd>
-	<script>
-	Diagram(
-	    Choice(0,
-	       NonTerminal('numeric_range'),
-	       NonTerminal('string_range')
-	 )).addTo();
-	</script>
-<dt>numeric_range:
-<dd>
-	<script>
-	Diagram(
-	    Choice(0,
-	       Sequence(
-	            NonTerminal('number'),
-	            Optional(
-	                Sequence(
-	                    "'..'",
-	                    Optional(NonTerminal('number'))
-	                )
-	            )
-	       ),
-	      Sequence(
-	           "'..'",
-	           NonTerminal('number')
-	       )
-	 )).addTo();
-	</script>
-<dt>string_range:
-<dd>
-	<script>
-	Diagram(
-	    Choice(0,
-	       Sequence(
-	            NonTerminal('string'),
-	            Optional(
-	                Sequence(
-	                    "'..'",
-	                    NonTerminal('string')
-	                )
-	            )
-	       ),
-	      Sequence(
-	           "'..'",
-	           NonTerminal('string')
-	       )
-	 )).addTo();
-	</script>
+<dt id='unit_definition'>unit_definition<a name='unit_definition'></a></dt>
+<dd><script src="js/diagrams/unit_definition.js"/></script></dd>
+<dt id='unit_coefficient'>unit_coefficient<a name='unit_coefficient'></a></dt>
+<dd><script src="js/diagrams/unit_coefficient.js"/></script></dd>
+<dt id='unit_offset'>unit_offset<a name='unit_offset'></a></dt>
+<dd><script src="js/diagrams/unit_offset.js"/></script></dd>
+<dt id='units'>units<a name='units'></a></dt>
+<dd><script src="js/diagrams/units.js"/></script></dd>
 </dl>
 
-<p>Note that the ranges in a value restriction may be open ended at
-one end.</p>
-
-<p>Continuing examples from the Insurance industry model:</p>
-
+<h5> Examples </h5>
 <pre>
-Claim Sequence is written as Unsigned Integer(32) restricted to {1..999};
-Contact Method is written as Char(1) restricted to {'B', 'H', 'M'};
+0.01 m^3 converts to cc;
+1000.0 cc converts to liter;
+299792458.0 m sec^-1 converts to lightspeed approximately;
+0.00000000011125945705385 C^2 N^-1 e^-2 electronmass^-1 hbar^2 m^-2 converts to bohrradius;
 </pre>
 
 <h3>Entity Types</h3>
 
 <p>
 Each Entity Type plays roles in at least one fact type, and is identified
-by the combination of one or more such roles. At least one identifying role
-is mandatory. CQL uses the closed-world assumption for non-mandatory
+by the combination of the counterparts of one or more such roles.
+At least one identifying role must be mandatory.
+<!--CQL uses the closed-world assumption for non-mandatory
 identifying roles, which means that the same identifier (with the same
 role missing) may not occur more than once in a population.
+-->
 </p>
 
 <dl>
-  <dt>entity_type:
-  <dd>
-	  <script>
-	  Diagram(
-		  Sequence(
-			  Optional("'each'"),
-			  "ID",
-			  "'is'",
-        	   Choice(0,
-			       Sequence(
-					   Optional("'independent'"),
-		   	           NonTerminal('identification')
-			       ),
-			      Sequence(
-			           NonTerminal('entity_subtype'),
-			           Optional(
-			                 NonTerminal('identification')
-			           )
-			      )
-			  ),
-			  Optional(
-			  	Sequence(
-					  "'where'",
-					  NonTerminal('reading')
-			  	)
-			  )
+<dt id='entity_type'>entity_type<a name='entity_type'></a></dt>
+<dd><script src="js/diagrams/entity_type.js"/></script></dd>
 
-	  )).addTo();
-	  </script>
-  <dt>entity_subtype:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-	        Choice(0, "'is a subtype of'", "'is a kind of'"),
-			 Optional("'independent'"),
-	        'ID',
-	        ZeroOrMore(
-	           Sequence(
-	               "','", 'ID'
-	           )
-	        )
-	  )).addTo();
-	  </script>
-  <dt>identification:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-	        "'identified by'",
-	        Choice(0,
-	            Sequence(
-	                "'its'",
-	                'ID',
-	                NonTerminal('vt_parameters'),
-					Optional(
-						Sequence(
-							NonTerminal('value_constraint'),
-							NonTerminal('enforcement')
-						)
-					)
-	             ),
-	             NonTerminal('role_list')
-	        )
-	   )).addTo();
-	  </script>
+<dt id='identification'>identification<a name='identification'></a></dt>
+<dd><script src="js/diagrams/identification.js"/></script></dd>
+
+<dt id='supertype_list'>supertype_list<a name='supertype_list'></a></dt>
+<dd><script src="js/diagrams/supertype_list.js"/></script></dd>
+
+<dt id='role_list'>role_list<a name='role_list'></a></dt>
+<dd><script src="js/diagrams/role_list.js"/></script></dd>
+
+<dt id='term_or_unary'>term_or_unary<a name='term_or_unary'></a></dt>
+<dd><script src="js/diagrams/term_or_unary.js"/></script></dd>
 </dl>
 
-<p>The simplest form of entity identification scheme is by a single
-role value, for which the reference mode shorthand is provided, as in:
-</p>
+<p>The simplest form of entity identification scheme is by a single value,
+similar to the General reference mode in ORM:
 <pre>
-    Thing is identified by its Value;
+    each Concept is identified by GUID;
 </pre>
 
-<p>
-<tt>Value</tt> is assumed to be (or created as) a value type.
-A subtype of <tt>Value</tt> is assumed (or created) called <tt>ThingValue</tt>.
-The <tt>Thing</tt> is then associated in an identifying one-to-one
-fact type with <tt>ThingValue</tt>. The result is equivalent to saying:
+Here, GUID is an existing object type, or will be asserted as a value type,
+and CQL will create the existential fact type "Concept has one GUID" with
+the alternate reading "GUID is of at most one Concept". If you don't want
+to use <em>has/is of</em>, you can provide your own reading, and still get the other.
 </p>
+
+<p>
+Popular reference modes from ORM derive a new value type that is a subtype
+of the specified type, and whose name includes the name of the new entity type.
+A value type restriction may also be appended:
 <pre>
-    ThingValue is written as Thing;
-    Thing is identified by ThingValue where
-	Thing has one ThingValue,
-	ThingValue is of at most one Thing;
+    each Item is identified by its Number(Digits: 14);
+    each Year is identified by its Number restricted to {1900..};
 </pre>
+
+Here, each Item has one Item Number. If Item Number has not already been declared,
+it will be defined as a subtype of Number, which will in turn be defined as
+a new value type if necessary. Again, you can use the default <em>has/is of</em>
+or can provide your own readings. Note the open-ended range in the definition of
+Year Number.
+</p>
+
+<p>
+You can define identification patterns long-hand, and this is the only
+way to define multi-part identifiers. Here's the equivalent to the above,
+and a multi-part definition:
+<pre>
+    each GUID is written as a GUID;
+    each Concept is identified by a GUID where
+	that Concept has one GUID,
+	that GUID is of at most one Concept;
+
+    each Number is written as a Number;
+    each Item Number is written as a Number(Digits: 14);
+    each Item is identified by an Item Number where
+	that Item has one Item Number,
+	that Item Number is of at most one Item;
+
+    each Policy is identified by a Year and a sequence- Number where
+	that Policy was issued in one Year,
+	that Policy is assigned one sequence- Number;
+</pre>
+Note that <em>that</em> is optional, as are the (equivalent) indefinite articles
+<em>a/an</em> and even the initial <em>each</em>. We think it's nicer to use
+the longer form however.
+</p>
+
+<p>
+Note that in defining single-role identification, both roles must be unique (a 1-to-1 relationship),
+and the new entity type's role must be mandatory. To use the inline definition of mandatory and
+uniqueness (<em>one</em> in the above), there must be two readings (one in each direction)
+because inline quantifiers like this may only be placed on the last role in a fact type reading.
+</p>
+
+<p>
+In defining a multi-part identifier, the entity type's counterparts must be unique
+(but not vice versa; we can issue more than one Policy in a Year!),
+and at least one must be mandatory. Note the hyphenation used with the word <em>sequence</em>.
+This binds the adjective sequence to Number, which verbalises properly and flows to column names.
+Adjectives may also be bound following the Term, for use e.g. in French.
+</p>
+
+<p>
+In all cases, any identifying role may be played by either a Value Type or an Entity Type.
+</p>
 
 <p>
 If the default fact type readings (<em>has/is of</em>) aren't appropriate,
-you can provide one or more alternative readings. The required uniqueness
-and mandatory constraints are still added where needed.
+you can provide your preferred readings. The required uniqueness and
+mandatory constraints are still added where needed.
+<pre>
+Item is identified by its Number where
+    Item is called Item Number;
+</pre>
 </p>
-<pre>
-    Thing is identified by its Name where
-	Thing is called ThingName;
-</pre>
 
-<p>Continuing the examples from an model from the Insurance industry:</p>
+<p>
+Some code generators make use of pragmas to control their behaviour:
+<dl>
+<dt id='mapping_pragmas'>mapping_pragmas<a name='mapping_pragmas'></a></dt>
+<dd><script src="js/diagrams/mapping_pragmas.js"/></script></dd>
 
-<pre>
-Asset is identified by its ID;
-Hospital is identified by its Name;
-
-Liability is identified by its Code restricted to {'D', 'L', 'R', 'U'};
-</pre>
+<dt id='mapping_pragma'>mapping_pragma<a name='mapping_pragma'></a></dt>
+<dd><script src="js/diagrams/mapping_pragma.js"/></script></dd>
+</dl>
+</p>
 
 <h3>Subtypes</h3>
 
-<p>An entity type may be declared to be a subtype (or more informally,
-using the word &ldquo;kind&rdquo;) of one or more other entity types,
-the supertypes.  Any subtype may play any of the roles of its supertypes.
-A subtype may have its own identification scheme, but doesn't need to.
-It will be identified by its relationship with its first supertype.
+<p>An entity type may be declared to be a subtype of one or more other entity types, the supertypes.
+A subtype instance is also an instance of each supertype, so it must play all their mandatory roles
+(it may play any others) and thus shares their identifiers. It may also have its own identification
+scheme (though this is not common; it will be identified by its relationship with its first supertype).
 </p>
 
 <pre>
-    Apple is a kind of Fruit;
+each Asset is identified by Asset ID;
+each Vehicle is a kind of Asset identified by VIN;
 
-    Employee is a kind of Person identified by its Number;
+each Employee is a kind of Person identified by its Number;
 </pre>
 
 <pre>
-    ShelfLife is written as Time in days;
-    Perishable has at most one ShelfLife;
-    Fruit has one Price per kg;
-    Apple is a kind of Fruit, Perishable;
+each Apple is a kind of Fruit;
+each Shelf Life is written as Time in days;
+Fruit has at most one Shelf Life;
+Fruit has one Price per kg;
+Apple Type is a kind of Fruit;
+Apple Type 'Jonathon' has Shelf Life 31 and has Price 3.20 per kg;
 </pre>
 
-<p>In these fact types, each apple must have a price and may record
-a shelf life.</p>
+<p>In these fact types, each fruit (and so each apple type) must have a price and maybe a shelf life.</p>
 
 <p>Declaring a subtype creates subtyping fact types, which is useful
-when subtyping relationships must be constrained.</p>
+when subtyping relationships must be explicitly queried.</p>
 
-<p>Continuing the examples from an model from the Insurance industry:</p>
-
-<pre>
-Person is a kind of Party;
-Vehicle is a kind of Asset identified by VIN
-</pre>
-
-<h3>Identification</h3>
-
-<p>Explanation TBC</p>
-
-<p>Continuing the examples from an model from the Insurance industry:</p>
-
+<p>
+An object type that can have instances which play no roles (other than
+its identifying roles) should be declared <em>independent</em>:
 <pre>
 State is independent identified by its Code;
 </pre>
-
-<h3>Role References</h3>
-
-<p>
-The full form of identification must be used where a new entity type is
-identified by its relationship to another entity type, where adjectives
-are applied, or where the entity type has more than one identifying role.
-In this last case, at least one reading must be provided for each fact
-type involved in the identification. Normally these readings will
-embed the appropriate uniqueness constraints to create each one-to-many
-relationship.  Each fact type reading in an entity type definition must
-involve the entity type and one of the identifying roles, and no other
-roles.
 </p>
 
-<dl>
-  <dt>role_list:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-			 Optional("'any'"),
-			 NonTerminal('role_ref'),
-             ZeroOrMore(
-                Sequence(
-                     Choice(0, "'and'", "','"),
-                     NonTerminal('role_ref')
-                )
-             )
-	   )).addTo();
-	  </script>
-  <dt>role_ref:
-  <dd>
-	  <script>
-	  Diagram(
-	  		  Choice(0,
-	  	 	     Sequence(
-	  	 	        ZeroOrMore(
-	  	 	           Sequence(
-	  	 	               'ID', Optional("'-'")
-	  	 	           )
-	  	 	        ),
-	  	 	        'ID',
-	  	 	        ZeroOrMore(
-	  	 	            Sequence(
-	  	 	               Optional("'-'"),
-	  	 	               'ID'
-	  	 	            )
-	  	 	        )
-	  			),
-	  			Sequence('ID', "'('", "'as'", 'ID', "')'"),
-	  			Sequence('ID', "'('", NonTerminal('decimal'), "')'")
-	   )).addTo();
-	  </script>
-</dl>
+<!--
+<h3>Extended Role Names</h3>
 
 <p>
 Note that hyphens are used here to indicate the use of adjectives, which
@@ -623,8 +560,9 @@ type</em>, these are the readings of a new fact type, which is objectified (name
 as the new entity type. This is discussed below, but in this case, the entity type
 has an identification scheme which is not drawn from the fact type roles.
 </p>
+-->
 
-<h2>Fact Types</h2>
+<h3>Fact Types</h3>
 
 <p>
 Fact types are declared as one or more fact type readings. Each
@@ -1698,7 +1636,7 @@ Expressions and lexical rules follow standard C, UNIX and HTTP conventions.
 		<script>
 		Diagram(
 		  Choice(0,
-			 Sequence("'", 'CHAR', "'")
+			 Sequence("'", 'CHAR', "'"),
 	 	     NonTerminal('decimal'),
 			 NonTerminal('real'),
              NonTerminal('octalnumber'),

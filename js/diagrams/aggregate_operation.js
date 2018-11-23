@@ -1,0 +1,3 @@
+ComplexDiagram(
+  NonTerminal('id'),
+).addTo();

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<link rel='stylesheet' href='railroad-diagrams.css'>
-<script src='railroad-diagrams.js'></script>
+<link rel='stylesheet' href='css/railroad-diagrams.css'>
+<script src='js/railroad-diagrams.js'></script>
 <style>
 body svg.railroad-diagram {
 	background-color: hsl(30,20%, 95%);
@@ -24,6 +24,9 @@ div svg.railroad-diagram {
 </style>
 
 <body>
+
+<script src="js/diagrams/cql_file.js"/></script>
+
 <h2 id='cql_file'>cql_file</h1>
 <script>
 ComplexDiagram(
@@ -511,7 +514,6 @@ ComplexDiagram(
   )
 ).addTo();
 </script>
-
 
 <h2 id='query'>query</h1><a name='query'/>
 <script>
@@ -1171,7 +1173,6 @@ ComplexDiagram(
   )
 ).addTo();
 </script>
-
 
 <h2 id='term'>term</h1><a name='term'/>
 <p>An object type name is one or more words (ids) which may not contain a hyphen.
