@@ -993,6 +993,13 @@ name is unique. We can say:</p>
 </pre>
 
 <p>
+Note that with "each Person occurs at most one time", this syntax is an
+Exclusion Constraint (disjunction), not a Presence Constraint.
+With "exactly one" it is also Mandatory (exactly one).  In both cases,
+a more succinct syntax may be available.
+</p>
+
+<p>
 The only ORM characteristic that cannot be expressed this way is a non-mandatory
 constraint having a minimum frequency above one; for example a constraint that
 allows zero, or more than two, occurrences. For example, in a footy tipping
@@ -1007,13 +1014,6 @@ outer join derivations.</p>
 </pre>
 
 <h4>External Mandatory Constraints</h4>
-
-<p>
-Note that in some cases, the syntax implies that at most one of the
-specified situations may apply. This is an Exclusion Constraint (disjunction),
-which may be mandatory (exactly one); this is different from a Presence
-Constraint.  In both cases, a more succinct syntax may be available:
-</p>
 
 <dl>
 <dt id='either_or'>either_or<a name='either_or'></a></dt>
