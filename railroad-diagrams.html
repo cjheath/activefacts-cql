@@ -545,7 +545,7 @@ ComplexDiagram(
 <script>
 ComplexDiagram(
   Sequence(
-    NonTerminal('query_clauses', {href: '#query_clauses'}),
+    NonTerminal('reading_clauses', {href: '#reading_clauses'}),
     Optional(Sequence(
       'where',
       NonTerminal('query_clauses', {href: '#query_clauses'}),
@@ -674,6 +674,9 @@ ComplexDiagram(
   )
 ).addTo();
 </script>
+
+<h2 id='reading_clauses'>reading_clauses</h1><a name='reading_clauses'/>
+<script src="js/diagrams/reading_clauses.js"/></script>
 
 <h2 id='contracted_clauses'>contracted_clauses</h1><a name='contracted_clauses'/>
 <script>

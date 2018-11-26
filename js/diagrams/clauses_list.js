@@ -3,7 +3,7 @@ ComplexDiagram(
     NonTerminal('clauses', {href: '#clauses'}),
     ZeroOrMore(Sequence(
       ',',
-      NonTerminal('clauses', {href: '#clauses'}),
+      NonTerminal('clauses', {href: '#clauses'})
     ))
   )
 ).addTo();

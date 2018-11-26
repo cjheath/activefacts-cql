@@ -1,6 +1,6 @@
 ComplexDiagram(
   Sequence(
-    NonTerminal('query_clauses', {href: '#query_clauses'}),
+    NonTerminal('reading_clauses', {href: '#reading_clauses'}),
     Optional(Sequence(
       'where',
       NonTerminal('query_clauses', {href: '#query_clauses'}),

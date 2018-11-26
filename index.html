@@ -97,9 +97,13 @@ Their special meaning applies only in the specific places they appear in the gra
 </p>
 
 <p>
-CQL statement are parsed by first identifying key expressions and terms while skipping the linking text.
-Next, each clause is matched to a fact type by using the linking text and the object types indicated,
-and the whole expression is then analysed.
+CQL statement are parsed by first identifying key expressions and terms
+(including role names and adjectives) while skipping the linking text.
+This allows identification of all the object types in each clause.
+Each clause is then matched to a fact type which has compatible object types
+by using the linking text and adjectives (whether or not a hyphen has been used),
+and the whole expression is then analysed. The remaining words of linking text
+(with the object types) form a reading which designates this the fact type.
 </p>
 
 <h5>Case and Whitespace</h5>
@@ -338,9 +342,14 @@ each Glass Area is written as an Integer in mm^2;
 each Acceleration is written as a Real in m/s^2;
 </pre>
 
-<h3>Units</h3>
+<h3>Unit Definitions</h3>
 <p>
-A unit definition defines a conversion to and from other more fundamental units, such as metres or kilowatt-hours.
+A unit definition defines a new unit identifier in terms of an
+a conversion to and from other more fundamental units. It allows an
+optional coefficient (real number or integer fraction) multiplied by one
+or more base units, each raised to an integer power. It's common to
+define the singular form of a unit, then also define the plural as
+equivalent.
 </p>
 
 <dl>
@@ -361,6 +370,43 @@ A unit definition defines a conversion to and from other more fundamental units,
 299792458.0 m sec^-1 converts to lightspeed approximately;
 0.00000000011125945705385 C^2 N^-1 e^-2 electronmass^-1 hbar^2 m^-2 converts to bohrradius;
 </pre>
+
+Units are defined by declaring conversion formulae involving base units. Both
+singular and plural names may be given. If a base unit is not otherwise defined,
+it is assumed to be fundamental. Formulae are limited to a coeficient and an
+offset (<it>ax</it> + <it>c</it>), where <it>x</it> may be any number of existing units each raised to
+any integer power. Conversion coeficients have a real numerator and an integral
+denominator which defaults to 1. The formula may be written in either direction,
+but the constants must be on the side of the base units. An extensive library
+of standard unit conversions is available. Ephemeral conversions can be defined;
+the conversion factor at a particular time is assumed to be available from some
+source. Approximate conversions can be annotated.
+
+<pre>
+25.4 millimeters converts to inch/inches;
+kelvin + 273.15 converts to celsius;
+9/5 celsius + 32 converts to fahrenheit;
+acceleration converts to metres second^-2;
+g converts to 9.8 acceleration approximately;
+0.853 dollarUS converts to dollarAU ephemeral;
+</pre>
+
+The use of units in defining value types and in query literals allows dimensional
+analysis and automatic conversions. This example shows a derived fact
+type ("Pane has Area") and a query that uses units conversion to list large
+panes of glass. Notice that the literal in last line has an associated unit (this line
+also has a contracted join, see below).
+
+<pre>
+Dimension is written as Real in millimeters;
+Width is written as Dimension; Height is written as Dimension;
+Pane has one Width; Pane has one Height;
+Pane has Area where
+Pane has Width, Pane has Height,
+Area = Width * Height;
+Pane has Area > 5 foot^2?
+</pre>
+
 
 <h3>Entity Types</h3>
 
@@ -389,6 +435,9 @@ role missing) may not occur more than once in a population.
 
 <dt id='term_or_unary'>term_or_unary<a name='term_or_unary'></a></dt>
 <dd><script src="js/diagrams/term_or_unary.js"/></script></dd>
+
+<dt id='reading_clauses'>reading_clauses<a name='reading_clauses'></a></dt>
+<dd><script src="js/diagrams/reading_clauses.js"/></script></dd>
 </dl>
 
 <p>The simplest form of entity identification scheme is by a single value,
@@ -565,151 +614,306 @@ has an identification scheme which is not drawn from the fact type roles.
 <h3>Fact Types</h3>
 
 <p>
-Fact types are declared as one or more fact type readings. Each
-reading provides a verbal description of the relationship between
-two or more object types, or a property of a single object type.
-Each object type is referred to as "playing a role" in the fact
-type.
+A Fact Type is an <em>expression of possibility</em>
+consisting of an optional naming expression,
+one or more fact type readings,
+optionally followed by a query (for a derived fact type).
+A Fact Type expresses a possible relationship between two or more objects
+or a characteristic of a single object.
+The objects are said to <em>play a role</em> in the instances of this fact type.
+The same object or (two objects of the same type) may play more than one role in the same fact.
 </p>
 
 <p>
-All the readings of a fact type must have the same set of role
-players.  The first reading of a fact type is the default reading,
-and provides the identification scheme when needed (when the fact
-type is objectified).
+Each reading provides a different verbal expression for the same meaning,
+so must have the same set of <em>role players</em>, often in a different order.
+When a named fact type is defined, each role player also has a <b>link fact</b> with
+the objectifying entity, so readings for these fact types may also be included.
+The first reading for a new fact type is preferred, and sets a default priority
+order when sorting fact instances.
 </p>
 
 <dl>
-  <dt>named_fact_type:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-			 'ID', "'is where'",
-	       NonTerminal('fact_type')
-	   )).addTo();
-	  </script>
-  <dt>fact_type:
-  <dd>
-	  <script>
-	  Diagram(
-	  	     Sequence(
-	  	           NonTerminal('reading'),
-				  ZeroOrMore(
-				  	Sequence(
-				  		"','",
-						NonTerminal('reading')
-				  	)
-				  )
-	  	   )).addTo();
-	  </script>
-  <dt>reading or query_clauses:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-		   NonTerminal('qualified_clauses'),
-		   ZeroOrMore(
-		       Choice(0, "'and'", "'or'"),
-		       NonTerminal('qualified_clauses')
-		   )
-	   )).addTo();
-	  </script>
-</dl>	   
-	   
-<p>Each fact type reading may contain a quantifier expression before the
-last role player, which can assert mandatory, uniqueness or frequency
-constraints over the allowed population of instances of that fact. A
-qualifier that asserts a ring constraint (see below) may also follow a
-reading.
-</p>
+<dt id='fact_type'>fact_type<a name='fact_type'></a></dt>
+<dd><script src="js/diagrams/fact_type.js"/></script></dd>
 
-<p>Note that a fact type does not have to be named; it can simply
-be a set of readings.  Naming makes the fact type an <em>object
-type</em>, and is required whenever no unique quantifier exists in
-the fact type, or where there are more than two roles.  Where a
-fact type isn&rsquo;t named, it cannot play roles in other fact
-types. This example shows an un-named and a named (objectified)
+<dt id='anonymous_fact_type'>anonymous_fact_type<a name='anonymous_fact_type'></a></dt>
+<dd><script src="js/diagrams/anonymous_fact_type.js"/></script></dd>
+
+<dt id='reading_clauses'>reading_clauses<a name='reading_clauses'></a></dt>
+<dd><script src="js/diagrams/reading_clauses.js"/></script></dd>
+
+<dt id='reading_clause'>reading_clause<a name='reading_clause'></a></dt>
+<dd><script src="js/diagrams/reading_clause.js"/></script></dd>
+</dl>
+
+<p>
+If a fact type is named, its instances can play a role in other facts.
+In some cases, a code generator will require that a fact type is named, especially
+if it has two roles with no uniqueness constraint, or has more than two roles.
+This example shows an un-named and a named (objectified)
 fact type:
 </p>
 
 <pre>
-    Person was born at one birth-Place;
-    Directorship is where Person directs Company;
+Person smokes;			  /* Unary fact type (characteristic) */
+Person was born at one birth-Place;
+Directorship is where
+   Person directs Company, Company is run by Person,  /* Two readings */
+   Person holds Directorship;     /* Link fact reading */
 </pre>
 
 <p>
-If an object type plays more than one role in a fact type, the
-separate roles must be distinguished by either adjectives or a
-defined role name. See the resolution rules under Resolving roles for
+If an object type plays more than one role in the same fact type, the
+separate roles must be distinguished by either adjectives, subscripts,
+or a defined role name. See the resolution rules under Resolving roles for
 more details.
 </p>
 
-<h3>Certainty and Qualifiers</h3>
+<p>
+A derived fact type also has a query. This query must contain at least one
+occurrence of the roles of the new fact type, but may link them together
+in a logical expression that allows computation of the population of the
+derived fact type. See the discussion of queries below.
+</p>
 
-<p>Certainty TBC</p>
+<h4>Construction of Readings</h4>
 
-<p>The qualifiers are encased in square brackets, and are most commonly
-used for ring constraints. See the section on constraints for more
-details. The <tt>maybe</tt> outer-join qualifier is only used in
-derivation clauses. Derivations are discussed below, under queries.</p>
-	   
-<dl>	   
-  <dt>qualified_clauses:
-  <dd>
-	  <script>
-	  Diagram(
-	  	     Sequence(
-                 NonTerminal('certainty'),	  		   
-                 NonTerminal('contracted_clauses'),
-                 Optional(NonTerminal('qualifiers'))
-	   	   )).addTo();
-	  </script>
-  <dt>certainty:
-  <dd>
-	  <script>
-	  Diagram(
- 		   Choice(0,
-                 Skip(),
-                "'definitely'",
-                "'maybe'",
-                "'it is not the case that'"
-            )
-	  ).addTo();
-	  </script>
-  <dt>qualifiers:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-	       "'['",
-	       NonTerminal('qualifier'),
-	       ZeroOrMore(
-	            Sequence(
-	               "','",
-	               NonTerminal('qualifier')
-	            )
-	        ),
-	       "']'"
-	   )).addTo();
-	  </script>
-  <dt>qualifier:
-  <dd>
-	  <script>
-	  Diagram(
-  	     Choice(0,
-           "'static'",
-           "'transient'",
-           "'intransitive'",
-           "'strongly intransitive'",
-           "'transitive'",
-           "'acyclic'",
-           "'symmetric'",
-           "'antisymmetric'",
-           "'reflexive'",
-           "'irreflexive'"
-	   	   )).addTo();
-	  </script>
+<p>
+A Reading is made up of noun phrases (involving an object type)
+and linking words (which can be any non-special text).
+Some of the optional elements in the discussion below are only usable in queries
+or in other special contexts, but we need to introduce them here.
+A Fact literal will for example include one <em>literal</em>
+for every value role.
+Queries may include <em>aggregate</em> or <em>objectification_step</em>
+elements, which will be explained later.
+</p>
+
+<dl>
+<dt id='linking_word'>linking_word<a name='linking_word'></a></dt>
+<dd><script src="js/diagrams/linking_word.js"/></script></dd>
+<dt id='noun_phrase'>noun_phrase<a name='noun_phrase'></a></dt>
+<dd><script src="js/diagrams/noun_phrase.js"/></script></dd>
+<dt id='simple_noun_phrase'>simple_noun_phrase<a name='simple_noun_phrase'></a></dt>
+<dd><script src="js/diagrams/simple_noun_phrase.js"/></script></dd>
+<dt id='variable'>variable<a name='variable'></a></dt>
+<dd><script src="js/diagrams/variable.js"/></script></dd>
+<dt id='role_name'>role_name<a name='role_name'></a></dt>
+<dd><script src="js/diagrams/role_name.js"/></script></dd>
+<dt id='subscript'>subscript<a name='subscript'></a></dt>
+<dd><script src="js/diagrams/subscript.js"/></script></dd>
+</dl>
+
+<p>
+Every role in a fact type must have a unique full name.
+Where the same object type plays two roles, this can be achieved by adding
+a numeric subscript to each, adding an explicit role name, or using
+distinctive leading or trailing adjectives (as in given-Name, family-Name).
+The adjectives are introduced by proper placement of a hyphen and perhaps white-space,
+and are detected by scanning the whole definition before attempting to parse it.
+See the discussion of Terms for more information.
+</p>
+
+<h4>Embedded constraints</h4>
+
+<p>
+Various constraints may be included in a noun phrase of a fact type definition.
+The simplest are <em>quantifiers</em>, which require that an instance of the object type
+may play this role at most once, exactly once, or at least once. Only the last
+role in any reading may have an embedded quantifier. Thus to define a one-to-one
+fact type using embedded constraints, it is essential to have two readings.
+The alternative is to verbalise a separate constraint elsewhere, which is much
+less concise.
+</p>
+
+<dl>
+<dt id='role_quantifier'>role_quantifier<a name='role_quantifier'></a></dt>
+<dd><script src="js/diagrams/role_quantifier.js"/></script></dd>
+<dt id='quantifier'>quantifier<a name='quantifier'></a></dt>
+<dd><script src="js/diagrams/quantifier.js"/></script></dd>
+<dt id='quantity'>quantity<a name='quantity'></a></dt>
+<dd><script src="js/diagrams/quantity.js"/></script></dd>
+</dl>
+
+<p>
+In some contexts, there is no need for a quantifier, but another article may be needed
+in the same place. The keywords <em>some</em> and <em>that</em> may be used to resolve
+ambiguous references to the same object type, or to make it clear where a name refers
+to the same instance previously mentioned in the same definition. In a query, the
+keyword <em>which</em> indicates that the population of this role should be included
+in the query result.
+</p>
+
+<p>
+The keyword <em>no</em> (as a quantifier) or <em>not</em> (as any linking word)
+indicates that there must be no matching instance of the corresponding fact.
+</p>
+
+<h4>Contracted Readings</h4>
+
+<p>
+In the definition of some entity types, and in many queries, a fact reading may
+start or end with an term that starts the next reading or comparison expression.
+This allows the use of more concise verbal forms called contractions.
+The three cases are:
+</p>
+<ul>
+<li> Left contraction: the repeated term is at the start, as in "Person drives car and smokes".
+This has the same meaning as "Person drives car and that Person smokes".
+<li> Right contraction: the repeated term is at the end, as in "Person saw Doctor who is experienced".
+This has the same meaning as "Person saw Doctor and that Doctor is experienced".
+Note that either the keywords <em>who</em> or <em>that</em> may be used.
+<li> Comparison contraction: Right contraction of a comparison operation, e.g. "Person is of Age >= 21",
+which means the same as "Person is of Age and that Age >= 21".
+</ul>
+
+<dl>
+<dt id='contracted_clauses'>contracted_clauses<a name='contracted_clauses'></a></dt>
+<dd><script src="js/diagrams/contracted_clauses.js"/></script></dd>
+<dt id='contraction'>contraction<a name='contraction'></a></dt>
+<dd><script src="js/diagrams/contraction.js"/></script></dd>
+<dt id='reading_contraction'>reading_contraction<a name='reading_contraction'></a></dt>
+<dd><script src="js/diagrams/reading_contraction.js"/></script></dd>
+<dt id='comparison_contraction'>comparison_contraction<a name='comparison_contraction'></a></dt>
+<dd><script src="js/diagrams/comparison_contraction.js"/></script></dd>
+<dt id='comparator'>comparator<a name='comparator'></a></dt>
+<dd><script src="js/diagrams/comparator.js"/></script></dd>
+<dt id='comparison'>comparison<a name='comparison'></a></dt>
+<dd><script src="js/diagrams/comparison.js"/></script></dd>
+<dt id='post_qualifiers'>post_qualifiers<a name='post_qualifiers'></a></dt>
+<dd><script src="js/diagrams/post_qualifiers.js"/></script></dd>
+<dt id='post_qualifier'>post_qualifier<a name='post_qualifier'></a></dt>
+<dd><script src="js/diagrams/post_qualifier.js"/></script></dd>
+</dl>
+
+<p><b>Qualifiers</b> are keywords enclosed in square brackets after a clause,
+which apply some condition to that clause. The most common case is to define
+a Ring Constraint - see the section on that</p>
+
+<h3>Queries</h3>
+
+<p>
+Many queries look like a statement of fact, but end with a question mark.
+Each term in the query corresponds to a variable.
+Except for the question mark, the body of a query may also occur in a derived fact type.
+Some of the variables may be bound to a specific value, while others may be free.
+Free variables may be preceded by the keyword "which" (indicating the value is sought)
+or "some" indicating that some value must exist, but we don't care to see it.
+The response to the query includes all sets of identifying values for the free variables
+which satisfy the conditions of the query. If a query has no free variables,
+the response is either "yes" or "no", indicating whether the conditions are met.
+Except for the question mark, the body of a query may also occur in a derived fact type.
+<p>
+
+<dl>
+<dt id='query'>query<a name='query'></a></dt>
+<dd><script src="js/diagrams/query.js"/></script></dd>
+
+<dt id='query_clauses'>query_clauses<a name='query_clauses'></a></dt>
+<dd><script src="js/diagrams/query_clauses.js"/></script></dd>
+
+<dt id='objectification_step'>objectification_step<a name='objectification_step'></a></dt>
+<dd><script src="js/diagrams/objectification_step.js"/></script></dd>
+
+<dt id='returning_clause'>returning_clause<a name='returning_clause'></a></dt>
+<dd><script src="js/diagrams/returning_clause.js"/></script></dd>
+
+<dt id='ordering_prefix'>ordering_prefix<a name='ordering_prefix'></a></dt>
+<dd><script src="js/diagrams/ordering_prefix.js"/></script></dd>
+
+<dt id='qualified_clauses'>qualified_clauses<a name='qualified_clauses'></a></dt>
+<dd><script src="js/diagrams/qualified_clauses.js"/></script></dd>
+
+<dt id='certainty'>certainty<a name='certainty'></a></dt>
+<dd><script src="js/diagrams/certainty.js"/></script></dd>
+</dl>
+
+<pre>
+Country Code 'CH'?  /* Does 'CH' exist as a Country Code? */
+Person 'Daniel' drives some Car?  /* Does Daniel drive any Car? */
+Person 'Daniel' drives which Car? /* What Car does Daniel drive? */
+Person 'Daniel' drives some Car and speeds?  /* Does Daniel drive any Car and does he speed? */
+sum of Fine in (Person 'Daniel' received Fine for Driving Offence); /* total fines incurred */
+</pre>
+
+<p>When a query involves a named fact type that has no suitable link fact readings,
+it may necessary to use a special expression (an <b>objectification_step</b>) to
+join the contents of the fact.
+In this expression, a parenthesised sub-expression follows the term, starting with
+the text <b>(in which</b> and ending with a closing parenthesis. So if we have
+a named fact type Booking as the objectification of "Person booked Table", we
+might say <em>Booking (in which some Person booked some Table)...</em>.
+
+<pre>
+// Ask which Waiters received which tip Amounts
+Service (in which which Waiter served some Meal) earned a tip of which Amount?
+</pre>
+
+<p>
+<b>Certainty</b> keywords may be used to indicate whether a given fact <em>must</em>
+be matched (the default), <em>may</em> be matched (outer join semantics) or
+<em>must not</em> be matched (anti-join). Note that inserting the quantifier
+<em>no</em> anywhere into a clause also means that fact must not be matched.
+</p>
+
+<h3>Result Constellations</h4>
+
+<p>
+The <b>returning clause</b> indicates which <em>other</em> roles in the query
+expression should be made available to a program that requests a derived fact.
+The behaviour is transitive; if the query uses other derived fact types with
+a returning clause, those roles also should be returned. These extra roles
+do not affect the population or behaviour of the derived fact type, but can
+be useful in justifying an individual instance.
+</p>
+
+<p>
+Normally, when processing a query, only the object instances that
+play the roles of the derived fact type (and satisfy the query)
+will be available in the results, and there is no defined ordering
+in the values. When the returning clause is used, additional
+object and fact instances may be accessible from the result,
+which may also be sorted. This extension of the result set is
+transitive, so that if a derived fact type invokes another derived
+fact type, the returned instances from the invoked fact
+type&rsquo;s returning clause will also be available.</p>
+
+<p>The results now include more than just a simple table of the
+instances that play the roles of the derived fact type. Instead,
+each object instance may be associated with additional facts for
+other roles it plays, and the roles of those facts will be
+populated by further object instances, and so on. This data
+structure is hereby defined as a <b>constellation</b>, which is
+where CQL gets its name. The query has selected certain instances
+from the entire fact population, much as an astronomer might select
+stars from the night sky.</p>
+
+<p>The use of <b>returning</b> doesn&rsquo;t change the contents of
+the defined fact type, it&rsquo;s merely a pragmatic instruction to
+the query engine about which additional instances will be useful to
+the calling program, and in what order.<br clear="all" />
+</p>
+
+<h3>Expressions</h3>
+
+<p>
+Algebraic and aggregate expressions follow simple patterns:
+</p>
+
+<dl>
+<dt id='expression'>expression<a name='expression'></a></dt>
+<dd><script src="js/diagrams/expression.js"/></script></dd>
+<dt id='sum'>sum<a name='sum'></a></dt>
+<dd><script src="js/diagrams/sum.js"/></script></dd>
+<dt id='product'>product<a name='product'></a></dt>
+<dd><script src="js/diagrams/product.js"/></script></dd>
+<dt id='factor'>factor<a name='factor'></a></dt>
+<dd><script src="js/diagrams/factor.js"/></script></dd>
+<dt id='aggregate'>aggregate<a name='aggregate'></a></dt>
+<dd><script src="js/diagrams/aggregate.js"/></script></dd>
+<dt id='aggregate_operation'>aggregate_operation<a name='aggregate_operation'></a></dt>
+<dd><script src="js/diagrams/aggregate_operation.js"/></script></dd>
 </dl>
 
 <pre>
@@ -718,353 +922,66 @@ Topic belongs to at most one parent-Topic [acyclic];
 Girl (as Girlfriend) is going out with at most one Boy (as Boyfriend) [symmetric]
 </pre>
 
-<h3>Contraction</h3>
+<h3>Constraints</h3>
 
-<dl>  
-   <dt>contracted_clauses:
-   <dd>
- 	  <script>
-	   Diagram(
-   	     Choice(0,
-	           NonTerminal('comparison'),
-	           OneOrMore(
-	               Choice(0,
-	                  NonTerminal('contraction'),
-	                  NonTerminal('phrase')
-	               )
-	           )
-	   	   )).addTo();
-	  </script>
-   <dt>contraction:
-   <dd>
- 	  <script>
-	   Diagram(
-   	     Choice(0,
-               NonTerminal('reading_contraction'),
-               NonTerminal('condition_contraction')
-	   	   )).addTo();
-	  </script>
-   <dt>reading_contraction:
-   <dd>
- 	  <script>
-	   Diagram(
-   	     Sequence(
-               NonTerminal('role'),
-               Optional(NonTerminal('qualifiers')),
-               Choice(0, "'that'","'who'"),
-               NonTerminal('certainty'),
-               NonTerminal('contracted_clauses')
-	   	   )).addTo();
-	  </script>
-   <dt>condition_contraction:
-   <dd>
- 	  <script>
-	   Diagram(
-	   	     Sequence(
-	                   NonTerminal('role'),
-	                   Optional(NonTerminal('qualifiers')),
-	                   NonTerminal('certainty'),
-	                   NonTerminal('comparator'),
-	                   NonTerminal('expression')
-	   	   )).addTo();
-	  </script>
-   <dt>comparison:
-   <dd>
- 	  <script>
-	   Diagram(
-	     Choice(0,
-	   	     Sequence(
-	                   NonTerminal('expression'),
-	                   NonTerminal('certainty'),
-	                   NonTerminal('comparator'),
-	                   NonTerminal('contraction'),
-	                   Optional(NonTerminal('qualifiers'))
-	               ),
-	              Sequence(
-	                  NonTerminal('certainty'),
-	                  NonTerminal('expression'),
-	                  NonTerminal('comparator'),
-	                  NonTerminal('expression')
-	              )
-	   	   )).addTo();
-	  </script>	   
-</dl>
-
-<h3>Roles in Fact Types</h3>
-
-<dl>  
-   <dt>phrase:
-   <dd>
- 	  <script>
-	   Diagram(
-	      Choice(0,
-	   	      NonTerminal('role'),
-	          NonTerminal('role_ref')
-	   	   )).addTo();
-	  </script>
-   <dt>role:
-   <dd>
- 	  <script>
-	   Diagram(
-	        Choice(0,
-	            NonTerminal('aggregate'),
-	            NonTerminal('simple_role')
-	   	   )).addTo();
-	  </script>
-   <dt>aggregate:
-   <dd>
- 	  <script>
-	   Diagram(
-        Sequence(
-            NonTerminal('ID'),
-            "'of'",
-            NonTerminal('role_ref'),
-            "'in'",
-            "'('",
-            NonTerminal('reading'),
-            "')'"
-	   	   )).addTo();
-	  </script>
-   <dt>simple_role:
-   <dd>
- 	  <script>
-	   Diagram(
-        Sequence(
-            Optional(
-                 Sequence(
-                     NonTerminal('qualifier'),
-                     NonTerminal('enforcement')
-                 )
-            ),
-            NonTerminal('role_ref'),
-            Choice(0,
-                  Sequence(
-                        NonTerminal('literal'),
-                        Optional(NonTerminal('unit'))
-                  ),
-                  Sequence(
-                        NonTerminal('value_constraint'),
-                        NonTerminal('enforcement')
-                   )                  
-             ),
-            Optional(NonTerminal('objectification'))
-	   	   )).addTo();
-	  </script>
-</dl>
+<h4>Value Constraints</h4>
 
 <p>
-The syntax here is ambiguous, because a fact_role consists of one or
-more IDs with optional hyphens to indicate adjectives, interspersed
-with arbitrary linking words (also IDs).  So how is the ambiguity resolved?
-</p>
-
-<p>
-First of all, CQL looks through all the readings in this definition,
-and finds the occurrences of known object type names. Each occurrence
-may be followed by the definition of a role name, or may have
-one or more associated adjectives attached using a hyphen (dash).
-Adjectives may not be the same as the name of any object type,
-or of any local role name, and the complete term (with adjectives)
-must likewise be unique.
-</p>
-
-<p>
-A subsequent scan finds all occurrences of these role names and
-terms with adjectives (which now don't require the hyphen).  Any
-remaining words are the open vocabulary which forms the reading
-that designates this fact type.
-</p>
-
-<p>
-When a fact type reading is re-iterated in order to invoke an
-existing fact type, for example in a constraint, in a derivation
-or to add a new reading to an existing fact type, there may be
-adjectives in the definition of the invoked fact type. These also
-must be matched in the reading.
-</p>
-
-<h4>Quantifiers</h4>
-
-<p>
-The final role in a reading may be preceeded by a quantifier, which does
-not form a part of the reading. These are normally used to apply a
-uniqueness constraint (<tt>at most one</tt>), a mandatory constraint
-(<tt>at least one</tt>) or both (<tt>exactly one</tt> or just
-<tt>one</tt>). Other forms allow various other role frequency
-constraints. The <tt>quantity</tt> here may be a positive integer or the
-word <tt>one</tt>. Note that some quantifiers are only used in derivations
-or in constraints.
-</p>
-
-<dl>
-<dt>quantifier:
-<dd>
-	<script>
-	Diagram(
-	   Choice(0,
-	      "'some'",
-	      "'that'",
-	      "'one'",
-	      Sequence("'exactly'", NonTerminal('quantity')),
-	      Sequence("'at least'", NonTerminal('quantity')),
-	      Sequence("'at most'", NonTerminal('quantity')),
-	      Sequence(
-	            "'at least'", NonTerminal('quantity'), "'and at most'", NonTerminal('quantity')
-	      ),
-	      Sequence(
-	           "'from'", NonTerminal("decimal"), "'to'", NonTerminal('decimal')
-	      )
-	 )).addTo();
-	</script>
-<dt>quantity:
-<dd>
-	<script>
-	Diagram(
-		Choice(0, "'one'", NonTerminal('number'))
-	).addTo();
-	</script>
-</dl>
-
-<p>In this way, CQL absorbs many of the uniqueness, mandatory and
-frequency constraints of Object Role Modeling.
-</p>
-
-<p>The only ORM
-characteristic that cannot be expressed this way is a non-mandatory
-constraint having a minimum frequency above one; for example a
-constraint that allows zero, or more than two, occurrences. For
-example, in a footy tipping competition, it might be the case that
-if a participant submits no tips this week, they get the tips
-published by a known tipster, but if they do submit tips, they must
-submit at least eight. This kind of non-mandatory frequency
-constraint may be expressed in CQL using the <b>maybe</b>
-qualifier, which is also used in outer join derivations.</p>
-
-<pre>
-    maybe Participant entered at least 8 Tips
-</pre>
-
-<h3>Value Restrictions</h4>
-
-<p>
-A value restriction may follow a role reference where the role is
+A value constraint may follow apply to a value type, or to a role
 played by a value type (or by an entity type ultimately identified
 by a single value type), and this constrains the allowed values of
-that value type in this role. In addition to fact type definitions,
-a value or a value restriction may be applied to fact instances
-and in derivations, where it has the obvious effect.
+that value. In addition to fact type definitions, a value constraint
+may be applied in derivations and to fact instances (one value only!),
+where it has the obvious effect.
 </p>
 
-<h3>Objectification</h3>
-
 <dl>
-   <dt>objectification:
-   <dd>
- 	  <script>
-	   Diagram(
-        Sequence(
-            "'('", "'in which'", NonTerminal('reading'), "')'"
-	   	   )).addTo();
-	  </script>
+<dt id='value_constraint'>value_constraint<a name='value_constraint'></a></dt>
+<dd><script src="js/diagrams/value_constraint.js"/></script></dd>
+
+<dt id='range_list'>range_list<a name='range_list'></a></dt>
+<dd><script src="js/diagrams/range_list.js"/></script></dd>
 </dl>
 
+<h4>Presence Constraints</h4>
 
-<pre>
-Service (in which Waiter served Meal) earned a tip of Amount
-</pre>
-
-<h2>Constraints</h2>
-
-<p>Quantifiers allow the definition of the most common kinds of
-constraints, the mandatory, uniqueness and frequency constraints
+<p>Embedded quantifiers allow the definition of the most common kinds of
+constraints, the internal mandatory, uniqueness and frequency constraints
 (collectively, CQL calls these <b>presence constraints</b>). Often
-there are constraints that cannot be expressed in this form
-however, such as when an object type must play one of many unrelated
-roles. This is handled in CQL by the use of an external constraint
-definition, or with a ring constraint qualifier.</p>
+there are constraints that cannot be expressed in this form, such as
+when an object type must play one or at most one of many unrelated roles
+(an external mandatory constraint, possibly disjunctive).
+</p>
 
 <dl>
-<dt>constraint
-<dd>
-	<script>
-	Diagram(
-	    Choice(0,
-	       NonTerminal('presence_constraint'),
-	       NonTerminal('subset_constraint'),
-	       NonTerminal('set_constraint'),
-	       NonTerminal('equality_constraint')
-	 )).addTo();
-	</script>
+<dt id='presence_constraint'>presence_constraint<a name='presence_constraint'></a></dt>
+<dd><script src="js/diagrams/presence_constraint.js"/></script></dd>
 
+<dt id='each_occurs_in_clauses'>each_occurs_in_clauses<a name='each_occurs_in_clauses'></a></dt>
+<dd><script src="js/diagrams/each_occurs_in_clauses.js"/></script></dd>
+
+<dt id='for_each_how_many'>for_each_how_many<a name='for_each_how_many'></a></dt>
+<dd><script src="js/diagrams/for_each_how_many.js"/></script></dd>
+
+<dt id='clauses_list'>clauses_list<a name='clauses_list'></a></dt>
+<dd><script src="js/diagrams/clauses_list.js"/></script></dd>
+
+<dt id='clauses'>clauses<a name='clauses'></a></dt>
+<dd><script src="js/diagrams/clauses.js"/></script></dd>
 </dl>
-	 
-<h3>Presence constraints</h3>
 
 <p>When a single role player must play one and only one (or at
 least one) of a set of roles, we can say:</p>
 
-<dl>
-<dt>presence_constraint:
-<dd>
-	<script>
-	Diagram(
-	    Choice(0,
-	        Sequence(
-	           "'each'",
-				Optional("'combination'"),
-			   NonTerminal('role_list'),
-	           "'occurs'",
-	           NonTerminal('quantifier'),
-	           Choice(0, "'time'", "'times'"), 
-	           NonTerminal('enforcement'),
-	           "'in'",
-	           NonTerminal('clauses_list')
-	        ),
-	       Sequence(
-	            Optional("'either'"),
-	            NonTerminal('clauses'),
-	            "'or'",
-	            NonTerminal('clauses'),
-	            NonTerminal('enforcement')
-	       )
-	 )).addTo();
-	</script>
-<dt>clauses_list:
-<dd>
-	<script>
-	Diagram(
-		Sequence(
-			NonTerminal('clauses'),
-			ZeroOrMore(
-				"','",
-				NonTerminal('clauses')
-			)
-		)
-	).addTo();
-	</script>
-<dt>clauses:
-<dd>
-	<script>
-	Diagram(
-		Sequence(
-			NonTerminal('contracted_clauses'),
-			ZeroOrMore(
-				"'and'",
-				NonTerminal('contracted_clauses')
-			)
-		)
-	).addTo();
-	</script>
-</dl>
- 
-For example:
- 
+In this example, a Range must have either a minimum Bound or a maximum
+Bound, or both:
+
 <pre><b>each</b> Range <b>occurs</b> at least one <b>time in</b>
 	Range has minimum-Bound,
 	Range has maximum-Bound;
 </pre>
 
-<p>For example, supposing that we were to identify Person instances
+<p>In another example, supposing that we were to identify Person instances
 by given name and family name (not a good idea in a real system!)
 we need to ensure that the <b>combination</b> given name, family
 name is unique. We can say:</p>
@@ -1075,35 +992,49 @@ name is unique. We can say:</p>
 	Person has family-Name;
 </pre>
 
-<h3>Set Constraints</h3>
+<p>
+The only ORM characteristic that cannot be expressed this way is a non-mandatory
+constraint having a minimum frequency above one; for example a constraint that
+allows zero, or more than two, occurrences. For example, in a footy tipping
+competition, it might be the case that if a participant submits no tips this week,
+they get the tips published by a known tipster, but if they do submit tips,
+they must submit at least eight. This kind of non-mandatory frequency constraint
+may be expressed in CQL using the <b>maybe</b> qualifier, which is also used in
+outer join derivations.</p>
+
+<pre>
+    maybe Participant entered at least 8 Tips
+</pre>
+
+<h4>External Mandatory Constraints</h4>
+
+<p>
+Note that in some cases, the syntax implies that at most one of the
+specified situations may apply. This is an Exclusion Constraint (disjunction),
+which may be mandatory (exactly one); this is different from a Presence
+Constraint.  In both cases, a more succinct syntax may be available:
+</p>
 
 <dl>
-<dt>set_constraint
-<dd>
-	<script>
-	Diagram(
-	    Choice(0,
-	        Sequence(
-	           "'for each'",
-	           NonTerminal('role_list'),
-	           NonTerminal('quantifier'),
-	           "'of these holds'",
-	           NonTerminal('enforcement'),
-	           "':'",
-	           NonTerminal('clauses_list')
-	        ),
-	       Sequence(
-	            Optional("'either'"),
-	            NonTerminal('clauses'),
-	            "'or'",
-	            NonTerminal('clauses'),
-	            "'but not both'",
-	            NonTerminal('enforcement')
-	       )
-	 )).addTo();
-	</script>
+<dt id='either_or'>either_or<a name='either_or'></a></dt>
+<dd><script src="js/diagrams/either_or.js"/></script></dd>
 
-</dl>
+<pre>
+either Person abstains from smoking or Person is at risk of cancer;
+</pre>
+
+<h3>Set Constraints</h3>
+<p>
+Set constraints compare two or more sets of one or more roles each.
+</p>
+
+<dt id='set_constraint'>set_constraint<a name='set_constraint'></a></dt>
+<dd><script src="js/diagrams/set_constraint.js"/></script></dd>
+
+<h4>Exclusion Constraints</h4>
+
+<dt id='either_or_not_both'>either_or_not_both<a name='either_or_not_both'></a></dt>
+<dd><script src="js/diagrams/either_or_not_both.js"/></script></dd>
 
 <pre>
 <b>for each</b> ReceivedItem exactly one<b> of these holds:</b>
@@ -1113,72 +1044,54 @@ name is unique. We can say:</p>
 
 <pre>
 <b>for each</b> Unit exactly one <b>of these holds</b>:
-	Unit is fundamental,
+	that Unit is fundamental,
 	that Unit is derived from some base-Unit;
 </pre>
 
-In the case where one of two fact types applies, you can use the more
+In the case where exactly one of two fact types applies, you can use the more
 natural form:
 
 <pre>
 <b>either</b> Unit is fundamental
-<b>or</b> Unit is derived from some base-Unit
+<b>or</b> that Unit is derived from some base-Unit
 <b>but not both</b>;
 </pre>
 
-<h3>Subset Constraints</h3>
+<h4>Subset Constraints</h4>
+<p>
+A subset constraint says that one thing is the case only if some other thing is.
+</p>
 
-<p>When one role may be played only if another is, you can use a
-subset constraint:</p>
+<dt id='subset_constraint'>subset_constraint<a name='subset_constraint'></a></dt>
+<dd><script src="js/diagrams/subset_constraint.js"/></script></dd>
 
-<dl>
-<dt>subset_constraint
-<dd>
-	<script>
-Diagram(
-    Sequence(
-        NonTerminal('clauses'),
-                'only if', NonTerminal('clauses'),
-       NonTerminal('enforcement')
- )).addTo();
- </script>
-</dl>
- 
- For example:
- 
+<dt id='a_only_if_b'>a_only_if_b<a name='a_only_if_b'></a></dt>
+<dd><script src="js/diagrams/a_only_if_b.js"/></script></dd>
+
+<dt id='if_b_then_a'>if_b_then_a<a name='if_b_then_a'></a></dt>
+<dd><script src="js/diagrams/if_b_then_a.js"/></script></dd>
+
 <pre>
-	Address has third-StreetLine
-	<b>only if</b>
-	Address has second-StreetLine;
+Address has third-StreetLine
+    <b>only if</b>
+    that Address has some second-StreetLine;
 </pre>
 
-<p>Note that this example didn&rsquo;t use the first and second
-StreetLine, as we assume that the first StreetLine is a mandatory
+<p>Note that this example didn't use the first and second StreetLine,
+as we assume that the first StreetLine is a mandatory
 part of the address, so the subset constraint would be
 redundant.</p>
 
-<h3>Equality Constraints</h3>
-
+<h4>Equality Constraints</h4>
 <p>Equality constraints declare that the populations of two or more
 roles (or sequences of roles) are the same. They are expressed using
 &lsquo;if and only if&rsquo;:</p>
 
-<dl>
-<dt>equality_constraint
-<dd>
-	<script>
-	Diagram(
-	    Sequence(
-	        NonTerminal('clauses'),
-	        OneOrMore(
-	             Sequence(
-	                'if and only  if', NonTerminal('clauses')
-	             )
-	        ),
-	       NonTerminal('enforcement')
-	 )).addTo();
-	</script>
-</dl>
+<dt id='equality_constraint'>equality_constraint<a name='equality_constraint'></a></dt>
+<dd><script src="js/diagrams/equality_constraint.js"/></script></dd>
+
+<dt id='if_and_only_if'>if_and_only_if<a name='if_and_only_if'></a></dt>
+<dd><script src="js/diagrams/if_and_only_if.js"/></script></dd>
 
 For example:
 
@@ -1209,13 +1122,26 @@ there is only one fact instance possible between A and B).</p>
 <p>This method for defining ring constraints is not fully general,
 and a new syntax is required for covering complex cases</p>
 
-<h3>Join constraints</h3>
+<h4>Deontic Constraints</h4>
+<p>
+A <strong>Constraint</strong> restricts the instances of objects and facts that are
+possible (alethic) or permissable (deontic) in a valid <strong>Population</strong>.
+Instances that break deontic constraints may be asserted, but are associated with some
+enforcement action introduced by a parenthesised expression starting with the keyword <strong>otherwise</strong>.
+</p>
+<dt id='enforcement'>enforcement<a name='enforcement'></a></dt>
+<dd><script src="js/diagrams/enforcement.js"/></script></dd>
+</dl>
 
-<p>Most of the above constraint types may use joins, where more
-than one fact type is joined together with the <b>and</b> keyword.
-A full discussion is beyond the scope of this paper, but
-here&rsquo;s a small example of a subset constraint using a
-join:</p>
+<h4>Join constraints</h4>
+
+<p>Most of the above constraint types may use joins (or more complex derivations),
+where more than one fact type is joined together with the <b>and</b> keyword.
+In general, any expression in a constraint may be an arbitrary derivation,
+and the constraint compares the population of specific roles that are projected
+from the derivations. Effectively the constraint applies over one or more derived
+fact types, but those fact types do not need to be given readings.
+Here is a small example of a subset constraint using derivations:</p>
 
 <pre>
 Diplomat speaks Language;
@@ -1229,35 +1155,17 @@ Diplomat serves in Country
 
 <p>This constraint requires that in order to serve in a country, a
 diplomat must speak at least one language used in that country.
-Many joins may be <em>contracted</em> using <em>who</em> or <em>that</em>.
-This example contracts like this:
+The use of a contraction makes this more succinct (and dressed up
+with some/that):
 </p>
 
 <pre>
-Diplomat serves in Country
+some Diplomat serves in some Country
 	<b>only if</b>
-	Diplomat speaks Language <b>that</b> is spoken in Country;
+	that Diplomat speaks some Language <b>that</b> is spoken in that Country;
 </pre>
 
-<h3>Enforcement</h3>
-
-<p>To be completed.</p>
-
-<dl>
-<dt>enforcement:
-<dd>
-	<script>
-	Diagram(
-	     Sequence(
-	         "'('",
-	         "'otherwise'",
-	         NonTerminal('action'),
-	        "')'"
-	   )).addTo();
-	</script>
-</dl>	
-
-<h2>Instances</h2>
+<h2>Instance data</h2>
 
 <h3>Value Instance</h3>
 
@@ -1271,9 +1179,9 @@ may be the target (the metamodel supports arbitrary named populations).</p>
 <pre>
     CompanyName 'Microsoft';
     Year 1999;
-    Company 'Microsoft';
+    Company 'Microsoft';      /* Entity identified by a single value */
 </pre>
-	
+
 <h3>Fact Instances</h3>
 
 <p>When a fact reading is invoked with values, a fact instance
@@ -1287,8 +1195,8 @@ name followed by a value:</p>
 <p>This form is allowed for any value type, or any entity type
 that&rsquo;s identified by a single value type (or an entity
 identified by a single entity identified by a single value type,
-etc). In more complex cases, it might be necessary to invoke more
-than one fact type to define the instance:</p>
+etc). In more complex cases, it might be necessary or convenient
+to invoke more than one fact type to define the instance:</p>
 
 <pre>
     Person is called given name &lsquo;Fred&rsquo;,
@@ -1306,47 +1214,6 @@ instance in each fact type reading; there is an implicit join over
 the two clauses.
 </p>
 
-<p>
-An <em>objectification join</em> allows traversal of an objectified
-fact type:
-</p>
-
-<pre>
-    Directorship <b>(where</b> Person &lsquo;Fred Bloggs&rsquo; directs Company &lsquo;Acme, Inc&rsquo;<b>)</b>
-      began on appointment Date &lsquo;2010-04-27&rsquo;;
-</pre>
-
-<h2>Fact Derivation (Queries)</h3>
-
-<p>Fact derivation is a large subject by itself, so we&rsquo;ll
-leave a detailed coverage for a future paper. Here&rsquo;s a short
-introduction however.</p>
-
-<p>When a fact type has the optional clauses that define its
-derivation, the population of that fact type is derived as a <b>
-query</b> over the fact types it invokes. Each condition clause is
-either a comparison, which compares a role value with a constant or
-another role value, or a fact type reading.</p>
-
-<p>For a reading, at least one role must match an occurrence of
-that role in the new fact type or in another reading in the
-derivation. This match defines a logical <b>join</b> operation
-across the fact populations. Where the same object type occurs in
-different roles, and those roles are not to be joined, additional
-adjectives or defined role names may be used to separate the
-roles.</p>
-
-<!--p>The values may be modified by functions, such as the built-in
-functions on the Date value type which can extract the year, month,
-day, etc from the Date.</p-->
-
-<p>It&rsquo;s possible to negate any invoked fact type by inserting
-the word <b>no</b> into it as a quantifier, or <b>not</b> as an
-additional linking word. Here are some examples of fact type
-derivations (the full fact type definition is elided):</p>
-
-
-
 <pre>
     Person has family Name,
 	family Name = &lsquo;Bloggs&rsquo;,
@@ -1355,355 +1222,61 @@ derivations (the full fact type definition is elided):</p>
 	Employee is managed by <b>no</b> Manager<b>;</b>
 </pre>
 
-<h3>Result Constellations</h4>
-
-<p>A fact derivation may include a <b>returning</b> clause.
-Normally, when processing a query, only the object instances that
-play the roles of the derived fact type (and satisfy the query)
-will be available in the results, and there is no defined ordering
-in the values. When the returning clause is used, additional
-object and fact instances may be accessible from the result,
-which may also be sorted. This extension of the result set is
-transitive, so that if a derived fact type invokes another derived
-fact type, the returned instances from the invoked fact
-type&rsquo;s returning clause will also be available.</p>
-
-<p>The results now include more than just a simple table of the
-instances that play the roles of the derived fact type. Instead,
-each object instance may be associated with additional facts for
-other roles it plays, and the roles of those facts will be
-populated by further object instances, and so on. This data
-structure is hereby defined as a <b>constellation</b>, which is
-where CQL gets its name. The query has selected certain instances
-from the entire fact population, much as an astronomer might select
-stars from the night sky.</p>
-
-<p>The use of <b>returning</b> doesn&rsquo;t change the contents of
-the defined fact type, it&rsquo;s merely a pragmatic instruction to
-the query engine about which additional instances will be useful to
-the calling program, and in what order.<br clear="all" />
+<h3>Context Notes</h3>
+<p>
+Business context such as the reasons for certain modeling decisions may
+need to be recorded. Although CQL is perhaps not the ideal way to do that,
+it is supported to support model exchange.
 </p>
-
-
 <dl>
-  <dt>query:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-			NonTerminal('query_clauses'), 
-	        Optional(
-	            Sequence(
-	                "'where'",
-	                NonTerminal('query_clauses')
-	            )
-	       ),
-	       Optional(
-	           NonTerminal('returning_clause')
-	       )
-	   )).addTo();
-	  </script>
-  <dt>returning_clause:
-  <dd>
-	  <script>
-	  Diagram(
-	     Sequence(
-			"'returning'", 
-	        ZeroOrMore(
-	            Sequence(
-	                "','",
-	                NonTerminal('phrase')
-	            )
-	       )
-	   )).addTo();	  
-	  </script>
+<dt id='context_note'>context_note<a name='context_note'></a></dt>
+<dd><script src="js/diagrams/context_note.js"/></script></dd>
+<dt id='agents'>agents<a name='agents'></a></dt>
+<dd><script src="js/diagrams/agents.js"/></script></dd>
+<dt id='description'>description<a name='description'></a></dt>
+<dd><script src="js/diagrams/description.js"/></script></dd>
+<dt id='as_agreed_by'>as_agreed_by<a name='as_agreed_by'></a></dt>
+<dd><script src="js/diagrams/as_agreed_by.js"/></script></dd>
 </dl>
 
-<h2>Unit Definitions</h2>
-
-<p>A unit definition defines a new unit identifier in terms of an
-optional coefficient (real number or integer fraction) multiplied by one
-or more base units, each raised to an integer power. It's common to
-define the singular form of a unit, then also define the plural as
-equivalent.
+<h3>Lexical Rules</h3>
+<p>
+Lexical rules mostly follow standard C, UNIX and HTTP conventions.
 </p>
 
-Units are defined by declaring conversion formulae involving base units. Both
-singular and plural names may be given. If a base unit is not otherwise defined,
-it is assumed to be fundamental. Formulae are limited to a coeficient and an
-offset (<it>ax</it> + <it>c</it>), where <it>x</it> may be any number of existing units each raised to
-any integer power. Conversion coeficients have a real numerator and an integral
-denominator which defaults to 1. The formula may be written in either direction,
-but the constants must be on the side of the base units. An extensive library
-of standard unit conversions is available. Ephemeral conversions can be defined;
-the conversion factor at a particular time is assumed to be available from some
-source. Approximate conversions can be annotated.
-
 <dl>
-<dt>unit_def:
-<dd>
-    <script>
-	Diagram(
-		  Sequence(
-			 Optional(NonTerminal('coefficient')),
-		     Optional(NonTerminal('units')),
-		     Optional(
-				 Sequence(
-					 "[+-]",
-				 	NonTerminal('number')
-				 )
-				 
-			 ),
-			 "'converts to'",
-			 'ID',
-			 Optional(
-			 	Sequence("'/'", 'ID')
-			 ),
-			 Choice(0,
-				 Skip(),
-			 	 "'approximately'",
-				 "'ephemera'"
-			 )
-		)).addTo();
-	</script>
-<dt>coefficient:
-<dd>
-	<script>
-	Diagram(
-	  Sequence(
-		  NonTerminal('number'),
-		  Optional(
-		  	Sequence("'/'", NonTerminal('number'))
-		  )
-	  )).addTo();
-	  </script>
-<dt>units:
-<dd>
-	<script>
-	Diagram(
-	  Sequence(
-	     NonTerminal('power_unit'),
-		 ZeroOrMore(NonTerminal('power_unit')),
-		 Optional(
-	         Sequence(
-	             "'/'",
-			     NonTerminal('power_unit'),
-				 ZeroOrMore(NonTerminal('power_unit'))
-	         )
-		)
-	)).addTo();
-	</script>
-<dt>power_unit:
-<dd>
-	<script>
-	Diagram(
-		Sequence(
-			'ID',
-			Optional(
-				Sequence(
-					"'^'",
-					Optional("'-'"),
-					'[0-9]' 
-				)	
-		)
-	)).addTo();
-	</script>
-</dl>
-
-<pre>
-25.4 millimeters converts to inch/inches;
-kelvin + 273.15 converts to celsius;
-9/5 celsius + 32 converts to fahrenheit;
-acceleration converts to metres second^-2;
-g converts to 9.8 acceleration approximately;
-0.853 dollarUS converts to dollarAU ephemeral;
-</pre>
-
-The use of units in defining value types and in query literals allows dimensional
-analysis and automatic conversions. This example shows a derived fact
-type ("Pane has Area") and a query that uses units conversion to list large
-panes of glass. Notice that the literal in last line has an associated unit (this line
-also has a contracted join, see below).
-
-<pre>
-Dimension is written as Real in millimeters;
-Width is written as Dimension; Height is written as Dimension;
-Pane has one Width; Pane has one Height;
-Pane has Area where
-Pane has Width, Pane has Height,
-Area = Width * Height;
-Pane has Area > 5 foot^2?
-</pre>
-
-<h2>Expressions and Lexical Rules</h2>
-
-Expressions and lexical rules follow standard C, UNIX and HTTP conventions.
-
-<dl>
-	<dt>expression:
-	<dd>
-		<script>
-		Diagram(
-			Sequence(
-				NonTerminal('sum'),
-				ZeroOrMore(
-					NonTerminal('comparator'),
-					NonTerminal('sum')
-				)
-			)
-		).addTo();
-		</script>
-	<dt>sum:
-	<dd>
-		<script>
-		Diagram(
-			Sequence(
-				NonTerminal('product'),
-				ZeroOrMore(
-					Choice(0, "'+'", "'-'"),
-					NonTerminal('product')
-				)
-			)
-		).addTo();
-		</script>
-	<dt>product:
-	<dd>
-		<script>
-		Diagram(
-			Sequence(
-				NonTerminal('factor'),
-				ZeroOrMore(
-					Choice(0, "'*'", "'/'", "'%'"),
-					NonTerminal('factor')
-				)
-			)
-		).addTo();
-		</script>
-   <dt>factor:
-   <dd>
-	<script>
-	Diagram(
-		Choice(0,
-			Sequence(
-				NonTerminal('literal'),
-				Optional(NonTerminal('unit'))
-			),
-			NonTerminal('role_ref'),
-			Sequence(
-				"'('",
-				NonTerminal('expression'),
-				"')'"
-			)
-		)
-	).addTo();
-	</script>
-   <dt>comparator:
-   <dd>
- 	  <script>
-	   Diagram(
-            Choice(0,
-	   	       "'<='", "'<>'" , "'<'" , "'='" , "'>='" , "'>'" , '!='
-	   	   )).addTo();
-	  </script>
-	<dt>literal
-	<dd>
-		<script>
-		Diagram(
-			  Choice(0,
-		 	     NonTerminal('boolean'),
-	             NonTerminal('string'),
-	             NonTerminal('number')
-			)).addTo();
-		</script>
-	<dt>boolean
-	<dd>
-		<script>
-		Diagram(
-		    Choice(0,
-		        "'true'", "'false'"
-		 )).addTo();
-		</script>
-	<dt>string
-	<dd>
-		<script>
-		Diagram(
-		    Sequence(
-		        "'", ZeroOrMore('CHAR'), "'"
-		 )).addTo();
-		</script>
-	<dt>number
-	<dd>
-		<script>
-		Diagram(
-		  Choice(0,
-			 Sequence("'", 'CHAR', "'"),
-	 	     NonTerminal('decimal'),
-			 NonTerminal('real'),
-             NonTerminal('octalnumber'),
-             NonTerminal('hex number')
-		)).addTo();
-		</script>
-	<dt>decimal
-	<dd>
-		<script>
-		Diagram(
-				  Sequence(
-			 	     Choice(0, Skip(), "'+'", "'-'"),
-		             Choice(0,
-                          Sequence("[1-9]", ZeroOrMore("[0-9]")),
-                          "0"
-                     )
-				)).addTo();
-		</script>
-	<dt>real
-	<dd>
-		<script>
-		Diagram(
-				  Sequence(
-			 	     Choice(0, Skip(), "'+'", "'-'"),
-		                     Choice(0,
-		                          Sequence("[1-9]", ZeroOrMore("[0-9]"), Optional(NonTerminal('fraction'))),
-		                          Sequence("0", NonTerminal('fraction'))
-		                     ),
-		                    Optional('exponent')
-				)).addTo();
-		</script>
-	<dt>fraction
-	<dd>
-		<script>
-		Diagram(
-				  Sequence(
-			 	     "'.'", OneOrMore("[0-9]")
-				)).addTo();
-		</script>
-	<dt>exponent
-	<dd>
-		<script>
-		Diagram(
-				  Sequence(
-			 	     "'('", "[Ee]", Choice(0, Skip(), "'+'", "'-'"), OneOrMore("[0-9]"), "')'"
-				)).addTo();
-		</script>
-	<dt>hexnumber
-	<dd>
-		<script>
-		Diagram(
-				  Sequence(
-			 	     "'0x'", OneOrMore("[0-9A-Fa-f]")
-				)).addTo();
-		</script>
-	<dt>octalnumber
-	<dd>
-		<script>
-		Diagram(
-				  Sequence(
-			 	     "'0'", OneOrMore("[0-7]")
-				)).addTo();
-		</script>
-	<dt>regular_expression
-	<dd>UNIX-style regular expression
-	<dt>url
-	<dd>HTTP-stule URL
+<dt id='range'>range<a name='range'></a></dt>
+<dd><script src="js/diagrams/range.js"/></script></dd>
+<dt id='numeric_range'>numeric_range<a name='numeric_range'></a></dt>
+<dd><script src="js/diagrams/numeric_range.js"/></script></dd>
+<dt id='string_range'>string_range<a name='string_range'></a></dt>
+<dd><script src="js/diagrams/string_range.js"/></script></dd>
+<dt id='literal'>literal<a name='literal'></a></dt>
+<dd><script src="js/diagrams/literal.js"/></script></dd>
+<dt id='boolean_literal'>boolean_literal<a name='boolean_literal'></a></dt>
+<dd><script src="js/diagrams/boolean_literal.js"/></script></dd>
+<dt id='string'>string<a name='string'></a></dt>
+<dd><script src="js/diagrams/string.js"/></script></dd>
+<dt id='string_char'>string_char<a name='string_char'></a></dt>
+<dd><script src="js/diagrams/string_char.js"/></script></dd>
+<dt id='number'>number<a name='number'></a></dt>
+<dd><script src="js/diagrams/number.js"/></script></dd>
+<dt id='real'>real<a name='real'></a></dt>
+<dd><script src="js/diagrams/real.js"/></script></dd>
+<dt id='fractional_real'>fractional_real<a name='fractional_real'></a></dt>
+<dd><script src="js/diagrams/fractional_real.js"/></script></dd>
+<dt id='fraction'>fraction<a name='fraction'></a></dt>
+<dd><script src="js/diagrams/fraction.js"/></script></dd>
+<dt id='exponent'>exponent<a name='exponent'></a></dt>
+<dd><script src="js/diagrams/exponent.js"/></script></dd>
+<dt id='hexnumber'>hexnumber<a name='hexnumber'></a></dt>
+<dd><script src="js/diagrams/hexnumber.js"/></script></dd>
+<dt id='octalnumber'>octalnumber<a name='octalnumber'></a></dt>
+<dd><script src="js/diagrams/octalnumber.js"/></script></dd>
+<dt>regular_expression
+<dd>UNIX-style regular expression
+<dt>url
+<dd>HTTP-style URL
 </dl>
 
 <h4>Footnotes</h4>
@@ -1717,9 +1290,7 @@ Expressions and lexical rules follow standard C, UNIX and HTTP conventions.
   </li>
 </ol>
 </div>
-
-
-	</div>
+</div>
 </div>
 <div id="footer" class="noprint">
 	<p>Copyright &copy; 2015 Infinuendo</p>

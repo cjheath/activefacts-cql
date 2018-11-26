@@ -19,7 +19,7 @@ ComplexDiagram(
     Sequence(
       Optional(NonTerminal('mapping_pragmas', {href: '#mapping_pragmas'}), 'skip'),
       Optional(NonTerminal('context_note', {href: '#context_note'}), 'skip'),
-      Optional(Sequence('where', NonTerminal('query_clauses', {href: '#query_clauses'})), 'skip'),
+      Optional(Sequence('where', NonTerminal('definition_clauses', {href: '#definition_clauses'})), 'skip'),
       ';'
     )
   )
