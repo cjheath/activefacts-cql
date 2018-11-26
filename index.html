@@ -59,7 +59,6 @@ div svg.railroad-diagram {
 </style>
 <script src='js/railroad-diagrams.js'></script>
 
-<!--title>Introduction to the</title-->
 <h1>
 Introduction to the Constellation Query Language
 </h1>
@@ -145,87 +144,100 @@ then may import (all or part of) other schemas, before starting
 new definitions.
 </p>
 
-<h5>Kinds of CQL definition</h5>
+<h5>CQL Definitions</h5>
 
-<ul type="disc">
-<li>
+<dl>
+<dt><a href="#ObjectTypes">Object Types</a></dt>
+<dd>
 Every <strong>Object Type</strong> has a name (a <strong>Term</strong>) consisting of one or more words.
 Each word starts with a letter and continues with any alphanumeric or underscore characters.
 A Term may be a prefix of another Term, but may not overlap (end with a suffix that's a prefix of another Term).
-</li>
+</dd>
 
-<li>
+<dt><a href="#Identification">Identification</a></dt>
+<dd>
 Every instance of an object type is <strong>distinguishable</strong> (intrinsically identifiable),
 such that any copy always refers to the same instance. There is no mechanism for
 extrinsic identification as in many object-oriented languages.
 This idea is critical to the application of formal logic - individual things must be identifiable
 even when there are multiple references to them.
-</li>
+</dd>
 
-<li>A <strong>Value Type</strong> is an Object Type defined using the key phase <strong>is written as</strong>,
+<dt><a href="#ValueTypes">Value Types</a></dt>
+<dd>A <strong>Value Type</strong> is an Object Type defined using the key phase <strong>is written as</strong>,
 since value instances are distinguished by a written form.
-</li>
+</dd>
 
-<li>An <strong>Entity Type</strong> is an Object Type of which each instance is distinguished by
+<dt><a href="#EntityTypes">Entity Types</a></dt>
+<dd>An <strong>Entity Type</strong> is an Object Type of which each instance is distinguished by
 roles in its <em>existential</em> facts. The ultimate identifier of an entity instance will be
 a set of value instances that play these roles (but this may be indirect).
 The key phase <strong>is identified by</strong> is the most common way to introduce an entity type.
-</li>
+</dd>
 
-<li>A <strong>Named Object Type</strong> is an Entity Type which is the objectification of one Fact Type.
+<dt><a href="#NamedObjectTypes">Named Object Types</a></dt>
+<dd>A <strong>Named Object Type</strong> is an Entity Type which is the objectification of one Fact Type.
 Each instance exists as one instance of a Fact of that Type. The key phrase is <strong>is where</strong>,
 e.g. <em>Directorship <strong>is where</strong> some Person directs some Company</em>.
 Each instance of the Object Type is identified by the unique roles in the fact,
 but an alternate identifier may be preferred.
-</li>
+</dd>
 
-<li>A <strong>Subtype</strong> is an Entity Type which is a sub-type of some other Entity Type
+<dt><a href="#SubType">Subtypes</a></dt>
+<dd>A <strong>Subtype</strong> is an Entity Type which is a sub-type of some other Entity Type
 (or perhaps even more than one) introduced by the key phrase <strong>is a kind of</strong>.
 Every instance of a subtype is also an instance of its supertype, and so is identifiable
 the same way, though a subtype may introduce a new preferred identification scheme as well.
-</li>
+</dd>
 
-<li>A <strong>Fact Type</strong> declares the possibility of a specific relationship between
+<dt><a href="#FactType">Fact Types</a></dt>
+<dd>A <strong>Fact Type</strong> declares the possibility of a specific relationship between
 instances of two or more object types, or a characteristic of an instance of a single object type.
 The Fact Type does this by providing one or more <strong>readings</strong> which are phrases
 that include linking words and the object type names. Linking words may occur at the start
 or end of a reading, and it is common for a fact type to have multiple readings, usually with
 the object types in a different order.
-</li>
+</dd>
 
-<li>
+<dt><a href="#FactInstances">Fact Instances</a></dt>
+<dd>
 A Fact instance must have exactly one object instance compatible with each such role of
 its object types. The Fact cannot be asserted if it has any missing object instances;
 nothing resembling an SQL NULL is possible.
-</li>
+</dd>
 
-<li>A <strong>Derived Fact Type</strong> is a Fact Type whose member instances may be computed
+<dt><a href="#DerivedFactTypes">Derived Fact Types</a></dt>
+<dd>A <strong>Derived Fact Type</strong> is a Fact Type whose member instances may be computed
 from a logical expression over other facts (analogous to an SQL view). A Derived Fact Type may
 be fully derived (all instances are derived) or semi-derived (some instances are derived,
 others may be asserted). Entity subtyping may also be derived, in a similar fashion.
-</li>
+</dd>
 
-<li>A <strong>Constraint</strong> restricts the instances of objects and facts that are
+<dt><a href="#Constraints">Constraints</a></dt>
+<dd>A <strong>Constraint</strong> restricts the instances of objects and facts that are
 possible (alethic) or permissable (deontic) in a valid <strong>Population</strong>.
 Instances that break deontic constraints may be asserted, but are associated with some
 enforcement action introduced by a parenthesised expression starting with the keyword <strong>otherwise</strong>.
 There are many types of constraints, as you will see below.
-</li>
+</dd>
 
-<li>An <strong>Instance</strong> of an object type or fact type, including at least the
+<dt><a href="#Instances">Instances</a></dt>
+<dd>An <strong>Instance</strong> of an object type or fact type, including at least the
 literal values to identify the instance. It is common for a single instance expression to
 define multiple fact and object instances. Each instance belongs to one <strong>Population</strong>.
 The default anonymous population is the <strong>seed</strong> data for the model, meaning
 that these instances must be present in any operational system, often as reference data.
 Other populations may define example data or specific test case scenarios.
-</li>
+</dd>
 
-<li>A <strong>Unit</strong> definition can provide automated conversion between numeric values,
+<dt><a href="#Units">Units</a></dt>
+<dd>A <strong>Unit</strong> definition can provide automated conversion between numeric values,
 including for ephemeral conversions like currency exchange rates, by reference to an external
 source of the ephemera.
-</li>
-</ul>
+</dd>
+</dl>
 
+<a name="Schemas"></a>
 <p>A CQL file must start with a schema definition:</p>
 
 <dl>
@@ -276,6 +288,7 @@ Other definitions and informal descriptions may follow:
 <dd><script src="js/diagrams/informal_description_body.js"/></script></dd>
 </dl>
 
+<a name="ObjectTypes"></a>
 <h3>Object Types</h3>
 
 <dl>
@@ -283,6 +296,7 @@ Other definitions and informal descriptions may follow:
 <dd><script src="js/diagrams/object_type.js"/></script></dd>
 </dl>
 
+<a name="ValueTypes"></a>
 <h3>Value Types</h3>
 
 <p>A Value Type is a kind of thing which has a single value that may be
@@ -342,6 +356,7 @@ each Glass Area is written as an Integer in mm^2;
 each Acceleration is written as a Real in m/s^2;
 </pre>
 
+<a name="Units"></a>
 <h3>Unit Definitions</h3>
 <p>
 A unit definition defines a new unit identifier in terms of an
@@ -407,7 +422,7 @@ Area = Width * Height;
 Pane has Area > 5 foot^2?
 </pre>
 
-
+<a name="EntityTypes"></a>
 <h3>Entity Types</h3>
 
 <p>
@@ -440,6 +455,7 @@ role missing) may not occur more than once in a population.
 <dd><script src="js/diagrams/reading_clauses.js"/></script></dd>
 </dl>
 
+<a name="Identification"></a>
 <p>The simplest form of entity identification scheme is by a single value,
 similar to the General reference mode in ORM:
 <pre>
@@ -533,6 +549,7 @@ Some code generators make use of pragmas to control their behaviour:
 </dl>
 </p>
 
+<a name="SubType"></a>
 <h3>Subtypes</h3>
 
 <p>An entity type may be declared to be a subtype of one or more other entity types, the supertypes.
@@ -574,22 +591,17 @@ State is independent identified by its Code;
 <h3>Extended Role Names</h3>
 
 <p>
-Note that hyphens are used here to indicate the use of adjectives, which
+The hyphens are used here to indicate the use of adjectives, which
 can be either leading or trailing as required by the language. The hyphen
 is only required once within a declaration, and this associates the
 adjective with that role player throughout this declaration.
 </p>
 
 <pre>
-    Person is identified by given-Name and family-Name where
-	Person is called one given Name, given Name is of Person,
-	Person has one family Name, family Name is of Person;
+Person is identified by given-Name and family-Name where
+    Person is called one given Name, given Name is of Person,
+    Person has one family Name, family Name is of Person;
 </pre>
-
-<p>Note that the uniqueness constraints for these fact types are
-shown. They could alternatively be provided later, but must be
-included within the same vocabulary.
-</p>
 
 <p>
 Hyphens may be used to designate multiple adjectives, but must
@@ -611,6 +623,7 @@ has an identification scheme which is not drawn from the fact type roles.
 </p>
 -->
 
+<a name="FactType"></a>
 <h3>Fact Types</h3>
 
 <p>
@@ -647,6 +660,7 @@ order when sorting fact instances.
 <dd><script src="js/diagrams/reading_clause.js"/></script></dd>
 </dl>
 
+<a name="NamedObjectTypes"></a>
 <p>
 If a fact type is named, its instances can play a role in other facts.
 In some cases, a code generator will require that a fact type is named, especially
@@ -791,6 +805,7 @@ which means the same as "Person is of Age and that Age >= 21".
 which apply some condition to that clause. The most common case is to define
 a Ring Constraint - see the section on that</p>
 
+<a name="DerivedFactTypes"></a>
 <h3>Queries</h3>
 
 <p>
@@ -922,6 +937,7 @@ Topic belongs to at most one parent-Topic [acyclic];
 Girl (as Girlfriend) is going out with at most one Boy (as Boyfriend) [symmetric]
 </pre>
 
+<a name="Constraints"></a>
 <h3>Constraints</h3>
 
 <h4>Value Constraints</h4>
@@ -1167,6 +1183,7 @@ some Diplomat serves in some Country
 
 <h2>Instance data</h2>
 
+<a name="Instances"></a>
 <h3>Value Instance</h3>
 
 <p>A value instance is defined by stating the name of the value type followed by
@@ -1182,6 +1199,7 @@ may be the target (the metamodel supports arbitrary named populations).</p>
     Company 'Microsoft';      /* Entity identified by a single value */
 </pre>
 
+<a name="FactInstances"></a>
 <h3>Fact Instances</h3>
 
 <p>When a fact reading is invoked with values, a fact instance
