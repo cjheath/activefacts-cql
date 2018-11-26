@@ -1,12 +1,3 @@
-<p>
-A term also allows zero or more leading adjectives and/or trailing adjectives.
-Leading adjectives are indicated by a hyphen after the first adjective,
-and trailing adjectives are indicated by a hyphen before the last adjective.
-This makes it complicated because (like a linking word) an adjective may be hyphenated.
-If adjectives are introduced by a hyphenated word, the hyphen is doubled instead of being adjacent.
-Accordingly, there are very precise rules about where spaces and hyphens are allowed inside terms.
-</p>
-<script>
 ComplexDiagram(
   Stack(
     Sequence(
