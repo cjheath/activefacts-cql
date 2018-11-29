@@ -59,14 +59,15 @@ div svg.railroad-diagram {
 </style>
 <script src='js/railroad-diagrams.js'></script>
 
-<h1>
-Introduction to the Constellation Query Language
-</h1>
+<h1>Syntax of the Constellation Query Language</h1>
 <p>The Constellation Query Language (<strong>CQL</strong>) is a language for constructing and querying
 <strong>fact-based information models</strong>. It is a textual representation of the graphical
-<a href="#ftn1" title="ORM Foundation"><strong>Object Role Modeling</strong></a> language, which
-fully implements semantics isomorphic to Codd's Relational Calculus.
+<a href="#ftn1" title="ORM Foundation"><strong>Object Role Modeling</strong></a> language,
+augmented with derivations (queries).
+CQL is also <em>relationally complete</em>; it implements all capabilities of Codd's Relational Algebra.
 </p>
+
+<h3>Introduction</h3>
 
 <h5>Open Vocabulary</h5>
 
@@ -137,16 +138,16 @@ where a target language has a data type that is not special in the code generato
 The syntax for value literals is near the end of this document.
 </p>
 
-<h5>CQL Schema</h5>
-
-<p> Every CQL file must begin with a schema definition statement,
-then may import (all or part of) other schemas, before starting
-new definitions.
-</p>
-
-<h5>CQL Definitions</h5>
+<h3>CQL Definitions</h3>
 
 <dl>
+<dt><a href="#Schema">Schema</a></dt>
+<dd>
+Every CQL file must begin with a schema definition statement,
+then may import (all or part of) other schemas, before starting
+new definitions.
+</dd>
+
 <dt><a href="#ObjectTypes">Object Types</a></dt>
 <dd>
 Every <strong>Object Type</strong> has a name (a <strong>Term</strong>) consisting of one or more words.
@@ -206,11 +207,12 @@ its object types. The Fact cannot be asserted if it has any missing object insta
 nothing resembling an SQL NULL is possible.
 </dd>
 
-<dt><a href="#DerivedFactTypes">Derived Fact Types</a></dt>
+<dt><a href="#Queries">Derived Fact Types</a></dt>
 <dd>A <strong>Derived Fact Type</strong> is a Fact Type whose member instances may be computed
-from a logical expression over other facts (analogous to an SQL view). A Derived Fact Type may
-be fully derived (all instances are derived) or semi-derived (some instances are derived,
-others may be asserted). Entity subtyping may also be derived, in a similar fashion.
+from a logical expression over other facts (a <a href="#Queries">Query</a>; analogous to an SQL view).
+A Derived Fact Type may be fully derived (all instances are derived) or semi-derived
+(some instances are derived, others may be asserted).
+Entity subtyping may also be derived, in a similar fashion.
 </dd>
 
 <dt><a href="#Constraints">Constraints</a></dt>
@@ -238,6 +240,7 @@ source of the ephemera.
 </dl>
 
 <a name="Schemas"></a>
+<h5>Schemas</h4>
 <p>A CQL file must start with a schema definition:</p>
 
 <dl>
@@ -257,6 +260,7 @@ source of the ephemera.
 <dd><script src="js/diagrams/version_number.js"></a></script></dd>
 </dl>
 
+<h5>Importing Schemas</h4>
 <p>An import definition imports object type names from another
 schema, possibly using the <b>alias</b> syntax to rename some
 terms. In addition, fact type readings from the imported vocabulary
@@ -274,9 +278,7 @@ translations specific to this vocabulary.</p>
 <dd><script src="js/diagrams/alias_list.js"/></script></dd>
 </dl>
 
-<p>
-Other definitions and informal descriptions may follow:
-</p>
+<h5>Statements</h4>
 <dl>
 <dt id='statement'>statement<a name='statement'></a></dt>
 <dd><script src="js/diagrams/statement.js"/></script></dd>
@@ -345,7 +347,7 @@ allowed by the supertype.
 <dd><script src="js/diagrams/parameter_literal.js"/></script></dd>
 </dl>
 
-<h5> Examples </h5>
+<h5>Examples</h5>
 <pre>
 each Month Nr is written as an Integer restricted to {1..12};
 each Currency Amount is written as a Decimal(Precision: 14, Scale: 2);
@@ -378,7 +380,7 @@ equivalent.
 <dd><script src="js/diagrams/units.js"/></script></dd>
 </dl>
 
-<h5> Examples </h5>
+<h5>Examples</h5>
 <pre>
 0.01 m^3 converts to cc;
 1000.0 cc converts to liter;
@@ -550,7 +552,7 @@ Some code generators make use of pragmas to control their behaviour:
 </p>
 
 <a name="SubType"></a>
-<h3>Subtypes</h3>
+<h5>Subtypes</h5>
 
 <p>An entity type may be declared to be a subtype of one or more other entity types, the supertypes.
 A subtype instance is also an instance of each supertype, so it must play all their mandatory roles
@@ -586,42 +588,6 @@ its identifying roles) should be declared <em>independent</em>:
 State is independent identified by its Code;
 </pre>
 </p>
-
-<!--
-<h3>Extended Role Names</h3>
-
-<p>
-The hyphens are used here to indicate the use of adjectives, which
-can be either leading or trailing as required by the language. The hyphen
-is only required once within a declaration, and this associates the
-adjective with that role player throughout this declaration.
-</p>
-
-<pre>
-Person is identified by given-Name and family-Name where
-    Person is called one given Name, given Name is of Person,
-    Person has one family Name, family Name is of Person;
-</pre>
-
-<p>
-Hyphens may be used to designate multiple adjectives, but must
-have a space beside the hyphen, on the side of the existing object
-type name. Otherwise the pair of (previously unseen) words is treated
-as a simple hyphenated term:
-</p>
-
-<pre>
-    suitably- trained Person is allowed to drive semi-trailer;
-</pre>
-
-<p>
-Finally, when the full form of identification is used, but there are fact type
-readings all referring to the same roles <em>none of which is the defined entity
-type</em>, these are the readings of a new fact type, which is objectified (named)
-as the new entity type. This is discussed below, but in this case, the entity type
-has an identification scheme which is not drawn from the fact type roles.
-</p>
--->
 
 <a name="FactType"></a>
 <h3>Fact Types</h3>
@@ -691,7 +657,7 @@ in a logical expression that allows computation of the population of the
 derived fact type. See the discussion of queries below.
 </p>
 
-<h4>Construction of Readings</h4>
+<h5>Construction of Readings</h4>
 
 <p>
 A Reading is made up of noun phrases (involving an object type)
@@ -729,7 +695,38 @@ and are detected by scanning the whole definition before attempting to parse it.
 See the discussion of Terms for more information.
 </p>
 
-<h4>Embedded constraints</h4>
+<h5>Extended Role Names</h5>
+
+<p>
+Hyphen used in Readings usually indicate the use of adjectives, which can be
+either leading or trailing (e.g. in French, trailing adjectives are used).
+The hyphen is only required once within a declaration, and this associates
+the adjective with that role player throughout this declaration.
+</p>
+
+<pre>
+Person is identified by given-Name and family-Name where
+    Person is called one given Name, given Name is of Person,
+    Person has one family Name, family Name is of Person;
+</pre>
+
+<p>
+Hyphens may be used to designate multiple adjectives, but must
+have a space beside the hyphen, on the side of the existing object
+type name. Otherwise the pair of (previously unseen) words is treated
+as a simple hyphenated word (not a term):
+</p>
+
+<pre>
+    suitably- trained Person is allowed to drive semi-trailer;
+</pre>
+
+<p>
+It is also possible to use hyphenated words in adjectives.
+See the details under <a href="#Terms">Terms</a>
+</p>
+
+<h5>Embedded constraints</h4>
 
 <p>
 Various constraints may be included in a noun phrase of a fact type definition.
@@ -764,7 +761,7 @@ The keyword <em>no</em> (as a quantifier) or <em>not</em> (as any linking word)
 indicates that there must be no matching instance of the corresponding fact.
 </p>
 
-<h4>Contracted Readings</h4>
+<h5>Contracted Readings</h4>
 
 <p>
 In the definition of some entity types, and in many queries, a fact reading may
@@ -805,7 +802,7 @@ which means the same as "Person is of Age and that Age >= 21".
 which apply some condition to that clause. The most common case is to define
 a Ring Constraint - see the section on that</p>
 
-<a name="DerivedFactTypes"></a>
+<a name="Queries"></a>
 <h3>Queries</h3>
 
 <p>
@@ -872,7 +869,7 @@ be matched (the default), <em>may</em> be matched (outer join semantics) or
 <em>no</em> anywhere into a clause also means that fact must not be matched.
 </p>
 
-<h3>Result Constellations</h4>
+<h5>Result Constellations</h5>
 
 <p>
 The <b>returning clause</b> indicates which <em>other</em> roles in the query
@@ -910,8 +907,7 @@ the query engine about which additional instances will be useful to
 the calling program, and in what order.<br clear="all" />
 </p>
 
-<h3>Expressions</h3>
-
+<h5>Expressions</h5>
 <p>
 Algebraic and aggregate expressions follow simple patterns:
 </p>
@@ -940,7 +936,7 @@ Girl (as Girlfriend) is going out with at most one Boy (as Boyfriend) [symmetric
 <a name="Constraints"></a>
 <h3>Constraints</h3>
 
-<h4>Value Constraints</h4>
+<h5>Value Constraints</h4>
 
 <p>
 A value constraint may follow apply to a value type, or to a role
@@ -959,7 +955,7 @@ where it has the obvious effect.
 <dd><script src="js/diagrams/range_list.js"/></script></dd>
 </dl>
 
-<h4>Presence Constraints</h4>
+<h5>Presence Constraints</h4>
 
 <p>Embedded quantifiers allow the definition of the most common kinds of
 constraints, the internal mandatory, uniqueness and frequency constraints
@@ -1029,7 +1025,7 @@ outer join derivations.</p>
     maybe Participant entered at least 8 Tips
 </pre>
 
-<h4>External Mandatory Constraints</h4>
+<h5>External Mandatory Constraints</h4>
 
 <dl>
 <dt id='either_or'>either_or<a name='either_or'></a></dt>
@@ -1039,7 +1035,7 @@ outer join derivations.</p>
 either Person abstains from smoking or Person is at risk of cancer;
 </pre>
 
-<h3>Set Constraints</h3>
+<h5>Set Constraints</h5>
 <p>
 Set constraints compare two or more sets of one or more roles each.
 </p>
@@ -1047,7 +1043,7 @@ Set constraints compare two or more sets of one or more roles each.
 <dt id='set_constraint'>set_constraint<a name='set_constraint'></a></dt>
 <dd><script src="js/diagrams/set_constraint.js"/></script></dd>
 
-<h4>Exclusion Constraints</h4>
+<h5>Exclusion Constraints</h4>
 
 <dt id='either_or_not_both'>either_or_not_both<a name='either_or_not_both'></a></dt>
 <dd><script src="js/diagrams/either_or_not_both.js"/></script></dd>
@@ -1073,7 +1069,7 @@ natural form:
 <b>but not both</b>;
 </pre>
 
-<h4>Subset Constraints</h4>
+<h5>Subset Constraints</h4>
 <p>
 A subset constraint says that one thing is the case only if some other thing is.
 </p>
@@ -1098,7 +1094,7 @@ as we assume that the first StreetLine is a mandatory
 part of the address, so the subset constraint would be
 redundant.</p>
 
-<h4>Equality Constraints</h4>
+<h5>Equality Constraints</h4>
 <p>Equality constraints declare that the populations of two or more
 roles (or sequences of roles) are the same. They are expressed using
 &lsquo;if and only if&rsquo;:</p>
@@ -1117,9 +1113,9 @@ Competition is in Series
 	Competition has series-Number;
 </pre>
 
-<h3>Ring Constraints</h3>
-
-<p>When a fact type includes the same object type more than once, or
+<h5>Ring Constraints</h5>
+<p>
+When a fact type includes the same object type more than once, or
 includes a supertype and its subtype, there&rsquo;s the possibility
 of the same instance playing both roles. This is often not desired,
 but further it introduces a whole class of further situations which
@@ -1138,26 +1134,32 @@ there is only one fact instance possible between A and B).</p>
 <p>This method for defining ring constraints is not fully general,
 and a new syntax is required for covering complex cases</p>
 
-<h4>Deontic Constraints</h4>
+<a name='Deontic'></a>
+<h5>Deontic Constraints</h4>
 <p>
-A <strong>Constraint</strong> restricts the instances of objects and facts that are
-possible (alethic) or permissable (deontic) in a valid <strong>Population</strong>.
-Instances that break deontic constraints may be asserted, but are associated with some
-enforcement action introduced by a parenthesised expression starting with the keyword <strong>otherwise</strong>.
+By default, a <strong>Constraint</strong> restricts the instances of objects and facts that are
+possible in a valid <strong>Population</strong>.  This is referred to as the <em>alethic</em> mode.
+When it is possible (but not permissable) to violate a constraint, that constraint is treated as </em>deontic</em>.
+These terms come from modal logic.
+CQL allows any constraint to be defined as deontic by specifying an <strong>enforcement</strong>
+action to be taken when a violation is detected. Maybe the action is ineffectual, but the possibility
+of this constraint being violated is indicated by the use of a note starting with <strong>otherwise</strong>.
+Implementations that process CQL should allow such situations to be asserted,
+and (if feasible) should support the enforcement actions.
 </p>
 <dt id='enforcement'>enforcement<a name='enforcement'></a></dt>
 <dd><script src="js/diagrams/enforcement.js"/></script></dd>
 </dl>
 
-<h4>Join constraints</h4>
-
-<p>Most of the above constraint types may use joins (or more complex derivations),
-where more than one fact type is joined together with the <b>and</b> keyword.
-In general, any expression in a constraint may be an arbitrary derivation,
-and the constraint compares the population of specific roles that are projected
-from the derivations. Effectively the constraint applies over one or more derived
-fact types, but those fact types do not need to be given readings.
-Here is a small example of a subset constraint using derivations:</p>
+<h5>Join constraints</h4>
+<p>
+Most of the above constraint types may include embedded queries, which ORM calls <em>join constraints</em>.
+Any clause in these constraints may be an arbitrary derivation (expression of joined clauses).
+The constraint compares the population of specific roles that are <em>projected</em> from the derivations.
+This has the same effect as if the constraint applied over derived fact types,
+except that those fact types do not need to be defined or given readings.
+Here is a small example of a subset constraint using derivations:
+</p>
 
 <pre>
 Diplomat speaks Language;
@@ -1198,7 +1200,7 @@ may be the target (the metamodel supports arbitrary named populations).</p>
 </pre>
 
 <a name="FactInstances"></a>
-<h3>Fact Instances</h3>
+<h5>Fact Instances</h5>
 
 <p>When a fact reading is invoked with values, a fact instance
 is created. The simplest is where a declaration is just an object type
@@ -1255,7 +1257,10 @@ it is supported to support model exchange.
 <dd><script src="js/diagrams/as_agreed_by.js"/></script></dd>
 </dl>
 
-<h3>Terms</h3>
+<h3>Lexical Rules</h3>
+
+<a name="Terms"></a>
+<h5>Terms</h5>
 <p>
 A term also allows zero or more leading adjectives and/or trailing adjectives.
 Leading adjectives are indicated by a hyphen after the first adjective,
@@ -1270,9 +1275,8 @@ Accordingly, there are very precise rules about where spaces and hyphens are all
 <dd><script src="js/diagrams/term.js"/></script></dd>
 </dl>
 
-<h3>Lexical Rules</h3>
 <p>
-Lexical rules mostly follow standard C, UNIX and HTTP conventions.
+Most other lexical rules mostly follow standard C, UNIX and HTTP conventions.
 </p>
 
 <dl>
@@ -1304,13 +1308,17 @@ Lexical rules mostly follow standard C, UNIX and HTTP conventions.
 <dd><script src="js/diagrams/hexnumber.js"/></script></dd>
 <dt id='octalnumber'>octalnumber<a name='octalnumber'></a></dt>
 <dd><script src="js/diagrams/octalnumber.js"/></script></dd>
-<dt>regular_expression
-<dd>UNIX-style regular expression
+<dt>regular_expression<a name='regular_expression'></a>
+<dd>A regular expression in CQL starts and ends with <strong>/</strong>.
+It may use the <strong>|</strong> character for alternates,
+(...) for grouping (starting with an optional group name between &lt;...&gt; characters),
+[character classes], *, + and ? for multiplicity and . for any character.
+Other characters use the syntax defined for strings.
 <dt>url
 <dd>HTTP-style URL
 </dl>
 
-<h4>Footnotes</h4>
+<h5>Footnotes</h4>
 <ol>
   <li><a href="http://ormfoundation.org/" name="ftn1" title="">The ORM Foundation</a>
   </li>
